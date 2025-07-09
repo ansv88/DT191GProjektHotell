@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inherits LayoutComponentBase
+
+<!-- Skip link för tillgänglighet -->
+<a href="#main-content" class="skip-link sr-only sr-only-focusable">Hoppa till huvudinnehåll</a>
+
+<div class="d-flex flex-column min-vh-100">
+<header>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <!-- Logga (bild) till vänster -->
+            <a class="navbar-brand position-relative" href="/">
+                <img src="images/dalsjns-grdshotell-high-resolution-logo-transparent.png" alt="Dalsjöns Gårdshotell logga" class="logo-hang" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Öppna navigationsmenyn">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto gap-3" role="menubar">
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All" role="menuitem">Hem</NavLink>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/vararum" role="menuitem">Våra Rum</NavLink>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/paketerbjudanden" role="menuitem">Paket & Erbjudanden</NavLink>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/restaurang" role="menuitem">Restaurang</NavLink>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/aktiviteter" role="menuitem">Aktiviteter</NavLink>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/omoss" role="menuitem">Om oss</NavLink>
+                        </li>
+                        <li class="nav-item" role="none">
+                            <NavLink class="nav-link" href="/kontakt" role="menuitem">Kontakt</NavLink>
+                        </li>
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item" role="none">
+                                <NavLink class="nav-link" href="/admin/main" role="menuitem">
+                                    <i class="fa-solid fa-gauge fa-xs me-1" aria-hidden="true"></i>
+                                    <span>Adminpanel</span>
+                                </NavLink>
+                            </li>
+                        }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <main id="main-content" class="flex-grow-1" role="main">
+     @Body
+</main>
+
+<Footer />
+<BackToTop />
+</div>
+
+@code {
+    private bool isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        isAdmin = user.Identity?.IsAuthenticated == true && user.IsInRole("Admin");
+    }
+}

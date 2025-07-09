@@ -1,0 +1,337 @@
+@page "/admin/contacts"
+@attribute [Authorize(Roles = "Admin")]
+@using Microsoft.AspNetCore.Authorization
+@using DT191GProjektHotell.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Hantera kontaktmeddelanden - Dalsjöns Gårdshotell</PageTitle>
+
+<h1 class="text-center mt-4 h3">Hantera kontaktmeddelanden</h1>
+
+<div class="container my-4">
+    @if (contacts.Count == 0)
+    {
+        <div class="alert alert-info text-center">
+            Inga kontaktmeddelanden hittades.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Namn</th>
+                        <th>E-post</th>
+                        <th>Ämne</th>
+                        <th>Status</th>
+                        <th style="min-width: 200px;">Åtgärder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var contact in contacts.OrderByDescending(c => c.Created))
+                    {
+                        <tr class="@GetRowClass(contact)">
+                            <td>@contact.Created.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@contact.FirstName @contact.LastName</td>
+                            <td>
+                                <a href="mailto:@contact.Email" class="@GetEmailLinkClass(contact)">@contact.Email</a>
+                            </td>
+                            <td>@contact.Subject</td>
+                            <td>
+                                @if (contact.IsAnswered)
+                                {
+                                    <span class="badge bg-primary">Besvarat</span>
+                                }
+                                else if (contact.IsRead)
+                                {
+                                    <span class="badge bg-success">Läst</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Oläst</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <button class="btn btn-sm btn-dark mb-1" @onclick="() => ViewMessage(contact)" title="Visa meddelande">
+                                        <i class="fa-solid fa-eye me-1"></i>Visa
+                                    </button>
+
+                                    @if (contact.IsAnswered)
+                                    {
+                                        <button class="btn btn-sm btn-warning mb-1" @onclick="() => MarkAsUnanswered(contact.ContactId)" title="Avmarkera som besvarat">
+                                            <i class="fa-solid fa-undo me-1"></i>Markera som ej besvarat
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-info mb-1" @onclick="() => MarkAsAnswered(contact.ContactId)" title="Markera som besvarat">
+                                            <i class="fa-solid fa-reply me-1"></i>Markera som besvarat
+                                        </button>
+                                    }
+
+                                    <button class="btn btn-sm btn-danger mb-1" @onclick="() => ShowDeleteConfirmation(contact)" title="Ta bort meddelande">
+                                        <i class="fa-solid fa-trash me-1"></i>Ta bort
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-custom" @onclick="GoBack">
+            <i class="fa-solid fa-arrow-left"></i> Tillbaka
+        </button>
+    </div>
+</div>
+
+<!-- Modal för att visa meddelande -->
+@if (selectedContact != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.3)">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Meddelande från @selectedContact.FirstName @selectedContact.LastName</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Datum:</strong> @selectedContact.Created.ToString("yyyy-MM-dd HH:mm")
+                    </div>
+                    <div class="mb-3">
+                        <strong>E-post:</strong> <a href="mailto:@selectedContact.Email">@selectedContact.Email</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Telefon:</strong> <a href="tel:@selectedContact.PhoneNumber" class="@GetPhoneLinkClass(selectedContact)">@selectedContact.PhoneNumber</a>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Ämne:</strong> @selectedContact.Subject
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status: </strong>
+                        @if (selectedContact.IsAnswered)
+                        {
+                            <span class="badge bg-primary">Besvarat</span>
+                        }
+                        else if (selectedContact.IsRead)
+                        {
+                            <span class="badge bg-success">Läst</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Oläst</span>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <strong>Meddelande:</strong>
+                        <div class="border p-3 mt-2 bg-light">
+                            @selectedContact.Message
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="mailto:@selectedContact.Email?subject=Re: @selectedContact.Subject" class="btn btn-primary">
+                        <i class="fa-solid fa-reply me-1"></i>Svara via e-post
+                    </a>
+                    @if (selectedContact.IsAnswered)
+                    {
+                        <button class="btn btn-warning" @onclick="() => MarkAsUnanswered(selectedContact.ContactId)">
+                            <i class="fa-solid fa-undo me-1"></i>Avmarkera besvarat
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-info" @onclick="() => MarkAsAnswered(selectedContact.ContactId)">
+                            <i class="fa-solid fa-reply me-1"></i>Markera som besvarat
+                        </button>
+                    }
+                    <button class="btn btn-danger" @onclick="() => ShowDeleteConfirmation(selectedContact)">
+                        <i class="fa-solid fa-trash me-1"></i>Ta bort
+                    </button>
+                    <button class="btn btn-secondary" @onclick="CloseModal">Stäng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Bekräftelsedialog för borttagning -->
+@if (contactToDelete != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bekräfta borttagning</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Är du säker på att du vill ta bort meddelandet från <strong>@contactToDelete.FirstName @contactToDelete.LastName</strong>?</p>
+                    <p class="text-muted">Ämne: @contactToDelete.Subject</p>
+                    <div class="alert alert-warning">
+                        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                        <strong>Varning:</strong> Denna åtgärd kan inte ångras.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" @onclick="ConfirmDelete">
+                        <i class="fa-solid fa-trash me-1"></i>Ja, ta bort
+                    </button>
+                    <button class="btn btn-secondary" @onclick="CancelDelete">Avbryt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ContactModel> contacts = new();
+    private ContactModel? selectedContact = null;
+    private ContactModel? contactToDelete = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadContacts();
+    }
+
+    private async Task LoadContacts()
+    {
+        using var context = DbFactory.CreateDbContext();
+        contacts = await context.ContactMessages.ToListAsync();
+    }
+
+    private async Task ViewMessage(ContactModel contact)
+    {
+        selectedContact = contact;
+        
+        // Markera automatiskt som läst när meddelandet visas
+        if (!contact.IsRead)
+        {
+            await MarkAsRead(contact.ContactId);
+        }
+    }
+
+    private async Task MarkAsRead(int contactId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var contact = await context.ContactMessages.FindAsync(contactId);
+        if (contact != null)
+        {
+            contact.IsRead = true;
+            await context.SaveChangesAsync();
+            await LoadContacts();
+            if (selectedContact?.ContactId == contactId)
+            {
+                selectedContact.IsRead = true;
+            }
+        }
+    }
+
+    private async Task MarkAsAnswered(int contactId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var contact = await context.ContactMessages.FindAsync(contactId);
+        if (contact != null)
+        {
+            contact.IsRead = true; // Säkerställ att det är markerat som läst
+            contact.IsAnswered = true;
+            await context.SaveChangesAsync();
+            await LoadContacts();
+            if (selectedContact?.ContactId == contactId)
+            {
+                selectedContact.IsRead = true;
+                selectedContact.IsAnswered = true;
+            }
+        }
+    }
+
+    private async Task MarkAsUnanswered(int contactId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var contact = await context.ContactMessages.FindAsync(contactId);
+        if (contact != null)
+        {
+            contact.IsAnswered = false;
+            // IsRead förblir true - meddelandet är fortfarande läst
+            await context.SaveChangesAsync();
+            await LoadContacts();
+            if (selectedContact?.ContactId == contactId)
+            {
+                selectedContact.IsAnswered = false;
+            }
+        }
+    }
+
+    private void ShowDeleteConfirmation(ContactModel contact)
+    {
+        contactToDelete = contact;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (contactToDelete != null)
+        {
+            using var context = DbFactory.CreateDbContext();
+            var contact = await context.ContactMessages.FindAsync(contactToDelete.ContactId);
+            if (contact != null)
+            {
+                context.ContactMessages.Remove(contact);
+                await context.SaveChangesAsync();
+                await LoadContacts();
+
+                if (selectedContact?.ContactId == contactToDelete.ContactId)
+                {
+                    selectedContact = null;
+                }
+            }
+        }
+        contactToDelete = null;
+    }
+
+    private void CancelDelete()
+    {
+        contactToDelete = null;
+    }
+
+    private void CloseModal()
+    {
+        selectedContact = null;
+    }
+
+    private string GetRowClass(ContactModel contact)
+    {
+        if (contact.IsAnswered)
+            return "table-info";
+        else if (contact.IsRead)
+            return "";
+        else
+            return "table-warning";
+    }
+
+    // Metod för att ge rätt CSS-klass till e-postlänkar
+    private string GetEmailLinkClass(ContactModel contact)
+    {
+        return contact.IsAnswered ? "text-dark fw-bold" : "";
+    }
+
+    // Metod för att ge rätt CSS-klass till telefonlänkar
+    private string GetPhoneLinkClass(ContactModel contact)
+    {
+        return contact.IsAnswered ? "text-dark fw-bold" : "";
+    }
+
+    [Inject] private NavigationManager NavManager { get; set; } = default!;
+
+    private void GoBack()
+    {
+        NavManager.NavigateTo("/admin/main");
+    }
+}

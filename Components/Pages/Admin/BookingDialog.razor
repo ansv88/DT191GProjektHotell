@@ -1,0 +1,136 @@
+﻿@using DT191GProjektHotell.Models
+@using DT191GProjektHotell.ViewModels
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+@if (Show && Room is not null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.3)">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <EditForm Model="_vm" OnValidSubmit="SaveAsync">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Boka rum @Room.RoomNumber (@Room.RoomType)</h5>
+                        <button type="button" class="btn-close" @onclick="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-2">
+                            <label class="form-label">Förnamn</label>
+                            <InputText class="form-control" @bind-Value="_vm.FirstName" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Efternamn</label>
+                            <InputText class="form-control" @bind-Value="_vm.LastName" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">E-post</label>
+                            <InputText class="form-control" @bind-Value="_vm.Email" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Telefonnummer</label>
+                            <InputText class="form-control" @bind-Value="_vm.PhoneNumber" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Check-in</label>
+                            <InputDate class="form-control" @bind-Value="_vm.CheckInDate" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Check-out</label>
+                            <InputDate class="form-control" @bind-Value="_vm.CheckOutDate" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Antal vuxna</label>
+                            <InputNumber class="form-control" @bind-Value="_vm.Adults" min="1" max="10" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Antal barn</label>
+                            <InputNumber class="form-control" @bind-Value="_vm.Children" min="0" max="10" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Notering till hotellet (valfritt)</label>
+                            <InputTextArea class="form-control" @bind-Value="_vm.Note" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Spara</button>
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Avbryt</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    [Parameter] public RoomModel? Room { get; set; }
+    [Parameter] public required DateTime CheckIn { get; set; }
+    [Parameter] public required DateTime CheckOut { get; set; }
+    [Parameter] public EventCallback OnBookingSaved { get; set; }
+
+    private readonly BookingViewModel _vm = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Room is not null)
+        {
+            _vm.RoomId = Room.RoomId;
+            _vm.RoomType = Room.RoomType;
+            _vm.CheckInDate = CheckIn;
+            _vm.CheckOutDate = CheckOut;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        using var ctx = DbFactory.CreateDbContext();
+
+        // Kontrollera om kund redan finns (enkel matchning på e-post)
+        var customer = await ctx.Customers.FirstOrDefaultAsync(c => c.Email == _vm.Email);
+        if (customer == null)
+        {
+            customer = new CustomerModel
+                {
+                    FirstName = _vm.FirstName,
+                    LastName = _vm.LastName,
+                    Email = _vm.Email,
+                    PhoneNumber = _vm.PhoneNumber
+                };
+            ctx.Customers.Add(customer);
+            await ctx.SaveChangesAsync();
+        }
+
+        if (Room == null)
+            return;
+
+        // Skapa bokning
+        var booking = new BookingModel
+            {
+                RoomId = Room.RoomId,
+                CustomerId = customer.CustomerId,
+                CheckInDate = _vm.CheckInDate ?? DateTime.Today,
+                CheckOutDate = _vm.CheckOutDate ?? DateTime.Today.AddDays(1),
+                Status = "Bekräftad",
+                Note = _vm.Note,
+                Adults = _vm.Adults,
+                Children = _vm.Children
+            };
+        ctx.Bookings.Add(booking);
+        await ctx.SaveChangesAsync();
+
+        await Close();
+        if (OnBookingSaved.HasDelegate)
+            await OnBookingSaved.InvokeAsync();
+    }
+
+    private async Task Close()
+    {
+        Show = false;
+        await ShowChanged.InvokeAsync(false);
+    }
+}

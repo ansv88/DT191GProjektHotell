@@ -1,0 +1,238 @@
+@page "/omoss"
+
+<PageTitle>Om oss - Dalsjöns Gårdshotell</PageTitle>
+
+<HeadContent>
+    <!-- Preload en mindre version av huvudbilden för snabbare LCP -->
+    <link rel="preload" as="image" href="/images/hotel-3514641_1920.jpg" />
+    <!-- Preload kritiska bilder för mobil -->
+    <link rel="preload" as="image" href="/images/bed-4416515_1280.jpg" media="(max-width: 768px)" />
+</HeadContent>
+
+<!-- Introduktion -->
+<section class="container my-5" aria-labelledby="intro-heading">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 id="intro-heading" class="h2 mb-4 main-title-color">Om oss - vår historia</h1>
+            <p class="intro-text">
+                Dalsjöns Gårdshotell har varit en familjeägd verksamhet i över fyra generationer.
+                Det som en gång började som en enkel gård nära Dalsjöns strand har utvecklats till
+                det charmiga gårdshotell som vi är idag - utan att förlora vår själ eller våra rötter.
+            </p>
+        </div>
+    </div>
+
+    <!-- Hotellets bild - optimerad för mobil -->
+    <div class="row mt-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="about-hero-image-container">
+                <img src="/images/hotel-3514641_1920.jpg"
+                     alt="Dalsjöns Gårdshotell i vacker naturmiljö vid Dalsjön med traditionell arkitektur"
+                     class="about-hero-image rounded shadow-sm"
+                     loading="lazy"
+                     decoding="async"
+                     width="1920"
+                     height="1080"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vår filosofi -->
+<section class="container my-5 bg-section" aria-labelledby="philosophy-heading">
+    <div class="row align-items-center flex-column-reverse flex-md-row">
+        <div class="col-12 col-md-6 text-center pb-3">
+            <h2 id="philosophy-heading">Vår filosofi</h2>
+            <p>
+                Vi tror på det enkla, det äkta och det personliga. Här på Dalsjöns Gårdshotell möter vi 
+                varje gäst som en del av vår utökade familj. Vi värnar om traditionen men omfamnar också 
+                förnyelse - alltid med respekt för vår vackra natur och vårt kulturarv.
+            </p>
+            <p>
+                Vår vision är att skapa en plats där tiden går lite långsammare, där man kan koppla av 
+                från vardagsstressen och återfinna kontakten med naturen och med sig själv.
+            </p>
+        </div>
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="/images/bed-4416515_1280.jpg" 
+                     alt="Mysig och hemtrevlig inredning som speglar hotellets filosofi om komfort och värme" 
+                     class="optimized-image rounded"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Familjen -->
+<section class="container my-5" aria-labelledby="family-heading">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="/images/childs-hand-8845806_1280.jpg" 
+                     alt="Familjens gemenskap runt middagsbordet som symbol för den personliga servicen" 
+                     class="optimized-image rounded"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6 text-center pb-3">
+            <h2 id="family-heading">Familjen bakom hotellet</h2>
+            <p>
+                Idag drivs hotellet av Anna och Erik Dalström tillsammans med deras tre barn. 
+                Erik, som är utbildad kock, leder vårt kök med passion för lokala råvaror och 
+                traditionella recept. Anna tar hand om gården, rummen och ser till att allt 
+                fungerar som det ska.
+            </p>
+            <p>
+                Våra barn växer upp här på hotellet och bidrar på olika sätt - från att hjälpa 
+                till i trädgården till att umgås med våra yngre gäster. Det är denna äkta 
+                familjeanda som genomsyrar allt vi gör.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Miljö och hållbarhet -->
+<section class="container my-5 bg-section" aria-labelledby="environment-heading">
+    <div class="row align-items-center flex-column-reverse flex-md-row">
+        <div class="col-12 col-md-6 text-center pb-3">
+            <h2 id="environment-heading">Miljötänk och hållbarhet</h2>
+            <p>
+                Som en verksamhet mitt i naturen tar vi vårt miljöansvar på största allvar.
+                Vi arbetar aktivt med att minska vårt ekologiska fotavtryck genom energieffektiva
+                lösningar, källsortering och användning av ekologiska produkter där det är möjligt.
+            </p>
+            <p>
+                Vår egen trädgård förser oss med färska grönsaker under säsongen, och vi samarbetar
+                med lokala producenter för att minska transporterna och stödja bygdens företag.
+            </p>
+            <div class="mt-4">
+                <h3 class="h5 main-title-color mb-3" style="color: #226f67;">Våra miljöinitiativ:</h3>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-leaf text-success me-2" aria-hidden="true"></i>
+                            <span class="small">Egen ekologisk köksträdgård</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-leaf text-success me-2" aria-hidden="true"></i>
+                            <span class="small">Lokala leverantörer inom 50 km</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-leaf text-success me-2" aria-hidden="true"></i>
+                            <span class="small">Energieffektiv uppvärmning</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-leaf text-success me-2" aria-hidden="true"></i>
+                            <span class="small">Källsortering och återvinning</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="/images/playground-4178424_1280.jpg"
+                     alt="Lekplats omgiven av grön natur som visar hotellets miljötänk och naturintegrering"
+                     class="optimized-image rounded"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Våra värden -->
+<section class="container my-5" aria-labelledby="values-heading">
+    <h2 id="values-heading" class="text-center mb-5 main-title-color">Våra värden</h2>
+    <div class="row g-4">
+        <!-- Gästvänlighet -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <article class="text-center h-100" aria-labelledby="hospitality-heading">
+                <div class="mb-3">
+                    <i class="fa-solid fa-heart fa-3x main-title-color" aria-hidden="true"></i>
+                </div>
+                <h3 id="hospitality-heading" class="h5 main-title-color">Gästvänlighet</h3>
+                <p>Varje gäst bemöts med värme och omtanke. Vi ser er som en del av vår familj under er vistelse.</p>
+            </article>
+        </div>
+
+        <!-- Äkthet -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <article class="text-center h-100" aria-labelledby="authenticity-heading">
+                <div class="mb-3">
+                    <i class="fa-solid fa-home fa-3x main-title-color" aria-hidden="true"></i>
+                </div>
+                <h3 id="authenticity-heading" class="h5 main-title-color">Äkthet</h3>
+                <p>Vi värnar om traditionerna och skapar äkta upplevelser utan onödiga krusiduller.</p>
+            </article>
+        </div>
+
+        <!-- Kvalitet -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <article class="text-center h-100" aria-labelledby="quality-heading">
+                <div class="mb-3">
+                    <i class="fa-solid fa-star fa-3x main-title-color" aria-hidden="true"></i>
+                </div>
+                <h3 id="quality-heading" class="h5 main-title-color">Kvalitet</h3>
+                <p>Vi strävar efter hög kvalitet i allt vi gör - från måltider till service och upplevelser.</p>
+            </article>
+        </div>
+
+        <!-- Hållbarhet -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <article class="text-center h-100" aria-labelledby="sustainability-heading">
+                <div class="mb-3">
+                    <i class="fa-solid fa-leaf fa-3x text-success" aria-hidden="true"></i>
+                </div>
+                <h3 id="sustainability-heading" class="h5 main-title-color">Hållbarhet</h3>
+                <p>Vi tar ansvar för framtiden genom miljömedvetet tänk och handlande i all vår verksamhet.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- Kontakt -->
+<section class="container my-5 bg-section" aria-labelledby="contact-section-heading">
+    <div class="row py-3">
+        <div class="col-lg-8 mx-auto text-center">
+            <h2 id="contact-section-heading" class="mb-4 main-title-color">Välkomna till oss!</h2>
+            <p class="mb-4">
+                Vi ser fram emot att få välkomna er till Dalsjöns Gårdshotell och att få vara en del av era minnen. 
+                Tveka inte att kontakta oss om ni har frågor eller vill veta mer om vad vi kan erbjuda.
+            </p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                <NavLink class="btn btn-custom d-flex justify-content-center align-items-center about-contact-btn" 
+                         href="/kontakt"
+                         aria-label="Gå till kontaktsidan för att komma i kontakt med oss">
+                    <span>Kontakta oss</span>
+                    <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+                </NavLink>
+                <NavLink class="btn btn-custom-2 d-flex justify-content-center align-items-center about-contact-btn" 
+                         href="/bokning"
+                         aria-label="Gå till bokningssidan för att boka er vistelse">
+                    <span>Boka er vistelse</span>
+                    <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+                </NavLink>
+            </div>
+        </div>
+    </div>
+</section>

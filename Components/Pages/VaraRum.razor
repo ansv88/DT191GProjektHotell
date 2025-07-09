@@ -1,0 +1,120 @@
+﻿@page "/vararum"
+
+<PageTitle>Våra rum - Dalsjöns Gårdshotell</PageTitle>
+
+<HeadContent>
+    <!-- Preload första rumsbild -->
+    <link rel="preload" as="image" href="/images/bedroom-3475656_1280.jpg" />
+</HeadContent>
+
+<section class="container my-5" aria-labelledby="rooms-heading">
+    <h1 id="rooms-heading" class="h2 text-center mt-4 main-title-color">Våra rum</h1>
+    <p class="lead text-center">Vi erbjuder tre olika rumstyper för att passa alla behov. Välj den som passar dig bäst!</p>
+
+    <div class="row mt-4" role="list" aria-label="Tillgängliga rumstyper">
+        <!-- Standardrum -->
+        <div class="col-12 col-md-4 mb-3" role="listitem">
+            <article class="card h-100 text-center package-card" aria-labelledby="standard-room-title">
+                <div class="package-image-container">
+                    <img src="images/bedroom-3475656_1280.jpg"
+                         class="package-image"
+                         alt="Standardrum med dubbelsäng, modernt arbetsområde och elegant inredning"
+                         loading="eager"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h2 id="standard-room-title" class="card-title h5">Standardrum</h2>
+                    <p class="card-text">
+                        Våra standardrum är prisvärda och bekväma, perfekta för en romantisk weekend eller en kortare vistelse. Rummet har en skön dubbelsäng, ett arbetsområde och eget badrum. WiFi, fri parkering och generös frukostbuffe ingår, och rummet är utrustat med modern underhållning.
+                    </p>
+                    <p><strong>Upp till 2 personer.</strong></p>
+                    <div class="my-4" role="img" aria-label="Faciliteter: Frukost, WiFi och Parkering ingår">
+                        <i class="fa-solid fa-utensils fa-xl me-2" aria-hidden="true"></i>
+                        <i class="fa-solid fa-wifi fa-xl me-2" aria-hidden="true"></i>
+                        <i class="fa-solid fa-square-parking fa-xl" aria-hidden="true"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <NavLink class="btn btn-custom w-100"
+                                 href="/bokning/Standardrum"
+                                 aria-label="Boka Standardrum, går till bokningssidan">
+                            Boka Standardrum
+                        </NavLink>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Deluxerum -->
+        <div class="col-12 col-md-4 mb-3" role="listitem">
+            <article class="card h-100 text-center package-card" aria-labelledby="deluxe-room-title">
+                <div class="package-image-container">
+                    <img src="images/bed-4416515_1280.jpg"
+                         class="package-image"
+                         alt="Deluxerum med rymlig säng, elegant inredning och vacker utsikt över trädgården"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h2 id="deluxe-room-title" class="card-title h5">Deluxerum</h2>
+                    <p class="card-text">
+                        Våra deluxerum erbjuder extra komfort och stil för den som vill lyxa till det. Dessa rum har rymliga sängar, elegant inredda interiörer, och en fantastisk utsikt över hotellets trädgård. Alla deluxerum har också gratis WiFi, fri parkering, en generös frukostbuffé och modern underhållning.
+                    </p>
+                    <p><strong>Upp till 2 personer.</strong></p>
+                    <div class="my-4" role="img" aria-label="Faciliteter: Frukost, WiFi och Parkering ingår">
+                        <i class="fa-solid fa-utensils fa-xl me-2" aria-hidden="true"></i>
+                        <i class="fa-solid fa-wifi fa-xl me-2" aria-hidden="true"></i>
+                        <i class="fa-solid fa-square-parking fa-xl" aria-hidden="true"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <NavLink class="btn btn-custom w-100"
+                                 href="/bokning/Deluxerum"
+                                 aria-label="Boka Deluxerum, går till bokningssidan">
+                            Boka Deluxerum
+                        </NavLink>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Familjerum -->
+        <div class="col-12 col-md-4 mb-3" role="listitem">
+            <article class="card h-100 text-center package-card" aria-labelledby="family-room-title">
+                <div class="package-image-container">
+                    <img src="images/sofa-6878039_1280.jpg"
+                         class="package-image"
+                         alt="Familjerum med flera sängar, bekväm sittgrupp och gott om utrymme för familjen"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h2 id="family-room-title" class="card-title h5">Familjerum</h2>
+                    <p class="card-text">
+                        Perfekt för familjen! Våra familjerum är rymliga med flera sängar, en bekväm sittgrupp samt gott om förvaring. I rummet ingår gratis WiFi, fri parkering, en generös frukostbuffé och möjligheten att boka extra barnutrustning vid behov. Rummen är utformade för att ge både barn och vuxna en avkopplande vistelse.
+                    </p>
+                    <p><strong>Upp till 4 personer.</strong></p>
+                    <div class="my-4" role="img" aria-label="Faciliteter: Frukost, WiFi och Parkering ingår">
+                        <i class="fa-solid fa-utensils fa-xl me-2" aria-hidden="true"></i>
+                        <i class="fa-solid fa-wifi fa-xl me-2" aria-hidden="true"></i>
+                        <i class="fa-solid fa-square-parking fa-xl" aria-hidden="true"></i>
+                    </div>
+                    <div class="mt-auto">
+                        <NavLink class="btn btn-custom w-100"
+                                 href="/bokning/Familjerum"
+                                 aria-label="Boka Familjerum, går till bokningssidan">
+                            Boka Familjerum
+                        </NavLink>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>

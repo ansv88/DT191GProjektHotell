@@ -1,0 +1,293 @@
+﻿@page "/admin/main"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using DT191GProjektHotell.Models
+@using Microsoft.EntityFrameworkCore
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager Nav
+@inject HttpClient Http
+@attribute [Authorize(Roles = "Admin")]
+@implements IDisposable
+
+<PageTitle>Adminpanel - Dalsjöns Gårdshotell</PageTitle>
+
+<h1 class="text-center mt-4 h2">Adminpanel</h1>
+
+<div class="container my-5">
+    <!-- Dashboard-statistik -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-3 admin-section-title h4">
+                <i class="fa-solid fa-chart-line me-2"></i>Översikt
+            </h2>
+        </div>
+
+        <!-- Statistikkort -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 admin-stat-card admin-stat-primary">
+                <div class="card-body text-white text-center">
+                    <i class="fa-solid fa-calendar-check fa-2x mb-2"></i>
+                    <h3 class="mb-1">@todaysBookings</h3>
+                    <p class="mb-0 small">Incheckningar idag</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 admin-stat-card admin-stat-info">
+                <div class="card-body text-white text-center">
+                    <i class="fa-solid fa-users fa-2x mb-2"></i>
+                    <h3 class="mb-1">@totalCustomers</h3>
+                    <p class="mb-0 small">Totalt antal gäster</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 admin-stat-card admin-stat-success">
+                <div class="card-body text-white text-center">
+                    <i class="fa-solid fa-bed fa-2x mb-2"></i>
+                    <h3 class="mb-1">@occupiedRooms/@totalRooms</h3>
+                    <p class="mb-0 small">Rum upptagna idag</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 admin-stat-card admin-stat-danger">
+                <div class="card-body text-white text-center position-relative">
+                    <i class="fa-solid fa-envelope fa-2x mb-2"></i>
+                    <h3 class="mb-1">@unreadCount</h3>
+                    <p class="mb-0 small">Olästa meddelanden</p>
+                    @if (unreadCount > 0)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                            Nytt!
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Senaste aktiviteter -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header admin-card-header">
+                    <h3 class="mb-0 h5" style="color: #226f67;">
+                        <i class="fa-solid fa-clock me-2"></i>Senaste aktiviteter
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (recentActivities.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var activity in recentActivities.Take(5))
+                            {
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <div>
+                                            <i class="@GetActivityIcon(activity.Type) me-2 admin-activity-icon"></i>
+                                            <span>@activity.Description</span>
+                                        </div>
+                                        <small class="text-muted">@activity.Timestamp.ToString("yyyy-MM-dd HH:mm")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Inga aktiviteter att visa.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigeringsknappar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3 admin-section-title">
+                <i class="fa-solid fa-cogs me-2"></i>Hantera
+            </h4>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-3">
+            <NavLink class="btn btn-outline-primary w-100 py-4 h-100 d-flex flex-column justify-content-center" href="/admin/bookings">
+                <i class="fa-solid fa-calendar-check fa-2x mb-2"></i>
+                <span class="h5 mb-1">Bokningar</span>
+                <small class="text-muted">Hantera alla bokningar</small>
+            </NavLink>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <NavLink class="btn btn-outline-primary w-100 py-4 h-100 d-flex flex-column justify-content-center" href="/admin/customers">
+                <i class="fa-solid fa-users fa-2x mb-2"></i>
+                <span class="h5 mb-1">Gäster</span>
+                <small class="text-muted">Kundregister och information</small>
+            </NavLink>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <NavLink class="btn btn-outline-primary w-100 py-4 h-100 d-flex flex-column justify-content-center" href="/admin/rooms">
+                <i class="fa-solid fa-bed fa-2x mb-2"></i>
+                <span class="h5 mb-1">Rum</span>
+                <small class="text-muted">Rumshantering och status</small>
+            </NavLink>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <NavLink class="btn btn-outline-primary w-100 py-4 h-100 d-flex flex-column justify-content-center position-relative" href="/admin/contacts">
+                <i class="fa-solid fa-envelope fa-2x mb-2"></i>
+                <span class="h5 mb-1">Kontaktmeddelanden</span>
+                <small class="text-muted">Hantera kundmeddelanden</small>
+                @if (unreadCount > 0)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @unreadCount
+                        <span class="visually-hidden">olästa meddelanden</span>
+                    </span>
+                }
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int unreadCount = 0;
+    private Timer? refreshTimer;
+
+    // Statistik
+    private int todaysBookings = 0;
+    private int totalCustomers = 0;
+    private int occupiedRooms = 0;
+    private int totalRooms = 0;
+
+    // Aktiviteter
+    private List<ActivityItem> recentActivities = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllData();
+
+        // Uppdatera var 30:e sekund
+        refreshTimer = new Timer(async _ => await InvokeAsync(async () =>
+        {
+            await LoadAllData();
+            StateHasChanged();
+        }), null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
+    }
+
+    private async Task LoadAllData()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+
+            // Ladda statistik
+            await LoadStatistics(context);
+            await LoadUnreadCount(context);
+            await LoadRecentActivities(context);
+        }
+        catch (Exception)
+        {
+            // Felhanterar tyst
+        }
+    }
+
+    private async Task LoadStatistics(ApplicationDbContext context)
+    {
+        var today = DateTime.Today;
+
+        // Incheckningar idag
+        todaysBookings = await context.Bookings
+            .CountAsync(b => b.CheckInDate.Date == today && b.Status == "Bekräftad");
+
+        // Totalt antal kunder
+        totalCustomers = await context.Customers.CountAsync();
+
+        // Rum upptagna idag
+        occupiedRooms = await context.Bookings
+            .CountAsync(b => b.CheckInDate.Date <= today &&
+                           b.CheckOutDate.Date > today &&
+                           b.Status == "Incheckad");
+
+        // Totalt antal rum
+        totalRooms = await context.Rooms.CountAsync();
+    }
+
+    private async Task LoadUnreadCount(ApplicationDbContext context)
+    {
+        unreadCount = await context.ContactMessages
+            .CountAsync(c => !c.IsRead);
+    }
+
+    private async Task LoadRecentActivities(ApplicationDbContext context)
+    {
+        var activities = new List<ActivityItem>();
+
+        // Senaste bokningar
+        var recentBookings = await context.Bookings
+            .Include(b => b.Customer)
+            .OrderByDescending(b => b.Created)
+            .Take(3)
+            .ToListAsync();
+
+        foreach (var booking in recentBookings)
+        {
+            activities.Add(new ActivityItem
+            {
+                Type = "booking",
+                Description = $"Ny bokning från {booking.Customer?.FirstName} {booking.Customer?.LastName}",
+                Timestamp = booking.Created
+            });
+        }
+
+        // Senaste kontaktmeddelanden
+        var recentContacts = await context.ContactMessages
+            .OrderByDescending(c => c.Created)
+            .Take(2)
+            .ToListAsync();
+
+        foreach (var contact in recentContacts)
+        {
+            activities.Add(new ActivityItem
+            {
+                Type = "contact",
+                Description = $"Nytt meddelande från {contact.FirstName} {contact.LastName} - {contact.Subject}",
+                Timestamp = contact.Created
+            });
+        }
+
+        recentActivities = activities.OrderByDescending(a => a.Timestamp).ToList();
+    }
+
+    private string GetActivityIcon(string type)
+    {
+        return type switch
+        {
+            "booking" => "fa-solid fa-calendar-plus",
+            "contact" => "fa-solid fa-envelope",
+            "customer" => "fa-solid fa-user-plus",
+            _ => "fa-solid fa-info-circle"
+        };
+    }
+
+    public void Dispose()
+    {
+        refreshTimer?.Dispose();
+    }
+
+    // Hjälpklass för aktiviteter
+    public class ActivityItem
+    {
+        public string Type { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+    }
+}

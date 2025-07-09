@@ -1,0 +1,227 @@
+﻿@page "/bokningsbekraftelse/{BookingId:int}"
+@using DT191GProjektHotell.Components.Layout
+@using DT191GProjektHotell.Data
+@using DT191GProjektHotell.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Bokningsbekräftelse - Dalsjöns Gårdshotell</PageTitle>
+
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center my-5" role="status" aria-live="polite">
+            <div class="spinner-border text-primary" role="progressbar" aria-label="Laddar bekräftelse">
+                <span class="visually-hidden">Laddar...</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <section class="container my-5" aria-labelledby="error-heading">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="alert alert-danger text-center" role="alert">
+                        <i class="fa-solid fa-exclamation-triangle fa-2x mb-3" aria-hidden="true"></i>
+                        <h1 id="error-heading" class="h4 mb-3">Ett fel uppstod</h1>
+                        <p class="mb-3">@errorMessage</p>
+                        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                            <NavLink href="/bokning" class="btn btn-custom">
+                                <i class="fa-solid fa-arrow-left me-2" aria-hidden="true"></i>
+                                Tillbaka till bokning
+                            </NavLink>
+                            <NavLink href="/" class="btn btn-outline-primary">
+                                <i class="fa-solid fa-home me-2" aria-hidden="true"></i>
+                                Till startsidan
+                            </NavLink>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else if (booking is not null)
+    {
+        <section class="container my-5" aria-labelledby="confirmation-heading">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Success header -->
+                    <div class="text-center mb-4">
+                        <div class="text-success mb-3">
+                            <i class="fa-solid fa-check-circle fa-4x" aria-hidden="true"></i>
+                        </div>
+                        <h1 id="confirmation-heading" class="h2 main-title-color">Bokningen är bekräftad!</h1>
+                        <p class="lead">Tack för att du valde Dalsjöns Gårdshotell</p>
+                    </div>
+
+                    <!-- Booking details card -->
+                    <article class="card shadow-sm mb-4" aria-labelledby="booking-details-heading">
+                        <div class="card-header bg-light">
+                            <h2 id="booking-details-heading" class="h5 mb-0">
+                                <i class="fa-solid fa-file-text me-2" aria-hidden="true"></i>
+                                Bokningsdetaljer
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <strong>Bokningsnummer:</strong>
+                                    <span class="d-block text-primary fs-5" aria-label="Bokningsnummer @booking.BookingId">
+                                        #@booking.BookingId.ToString("D6")
+                                    </span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Status:</strong>
+                                    <span class="badge bg-success ms-2">@(booking.Status ?? "Bekräftad")</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Rumstyp:</strong>
+                                    <span class="d-block">@(booking.Room?.RoomType ?? "Information saknas")</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Rumsnummer:</strong>
+                                    <span class="d-block">@(booking.Room?.RoomNumber ?? "Tilldelas vid incheckning")</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Ankomst:</strong>
+                                    <time datetime="@booking.CheckInDate.ToString("yyyy-MM-dd")" class="d-block">
+                                        @booking.CheckInDate.ToString("dddd, d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+                                    </time>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Avresa:</strong>
+                                    <time datetime="@booking.CheckOutDate.ToString("yyyy-MM-dd")" class="d-block">
+                                        @booking.CheckOutDate.ToString("dddd, d MMMM yyyy", new System.Globalization.CultureInfo("sv-SE"))
+                                    </time>
+                                </div>
+                            <div class="col-sm-6">
+                                <strong>Antal gäster:</strong>
+                                <span class="d-block">
+                                    @booking.Adults @(booking.Adults == 1 ? "vuxen" : "vuxna")
+                                    @if (booking.Children > 0)
+                                    {
+                                        <span>, @booking.Children barn</span>
+                                    }
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Antal nätter:</strong>
+                                <span class="d-block">@((booking.CheckOutDate - booking.CheckInDate).Days) @((booking.CheckOutDate - booking.CheckInDate).Days == 1 ? "natt" : "nätter")</span>
+                            </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Contact information -->
+                    <article class="card shadow-sm mb-4" aria-labelledby="contact-details-heading">
+                        <div class="card-header bg-light">
+                            <h2 id="contact-details-heading" class="h5 mb-0">
+                                <i class="fa-solid fa-user me-2" aria-hidden="true"></i>
+                                Kontaktinformation
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <strong>Namn:</strong>
+                                    <span class="d-block">@(booking.Customer?.FirstName ?? "") @(booking.Customer?.LastName ?? "")</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>E-post:</strong>
+                                    @if (!string.IsNullOrEmpty(booking.Customer?.Email))
+                                    {
+                                        <a href="mailto:@booking.Customer.Email" class="d-block">@booking.Customer.Email</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="d-block">Ingen e-post registrerad</span>
+                                    }
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Telefon:</strong>
+                                    @if (!string.IsNullOrEmpty(booking.Customer?.PhoneNumber))
+                                    {
+                                        <a href="tel:@booking.Customer.PhoneNumber" class="d-block">@booking.Customer.PhoneNumber</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="d-block">Inget telefonnummer registrerat</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Information box -->
+                    <div class="alert alert-info" role="status">
+                        <i class="fa-solid fa-info-circle me-2" aria-hidden="true"></i>
+                        <strong>Viktig information:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>En bekräftelse har skickats till din e-postadress</li>
+                            <li>Ta med giltig legitimation vid incheckning</li>
+                            <li>Incheckning: från kl. 15:00</li>
+                            <li>Utcheckning: senast kl. 11:00</li>
+                            <li>Kontakta oss för ändringar eller avbokning</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action buttons -->
+                <div class="text-center">
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <NavLink href="/" class="btn btn-custom">
+                            <i class="fa-solid fa-home me-2" aria-hidden="true"></i>
+                            Till startsidan
+                        </NavLink>
+                        <NavLink href="/kontakt" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-phone me-2" aria-hidden="true"></i>
+                            Kontakta oss
+                        </NavLink>
+                        <button class="btn btn-outline-secondary" @onclick="PrintPage">
+                            <i class="fa-solid fa-print me-2" aria-hidden="true"></i>
+                            Skriv ut
+                        </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+    }
+
+@code {
+    [Parameter]
+    public int BookingId { get; set; }
+
+    private BookingModel? booking;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            booking = await context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.Room)
+                .FirstOrDefaultAsync(b => b.BookingId == BookingId);
+
+            if (booking == null)
+            {
+                errorMessage = "Bokningen kunde inte hittas.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void PrintPage()
+    {
+        NavigationManager.NavigateTo("javascript:window.print()", true);
+    }
+}

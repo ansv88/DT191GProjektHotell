@@ -1,0 +1,456 @@
+﻿@page "/admin/bookings"
+@attribute [Authorize(Roles = "Admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using DT191GProjektHotell.Data
+@using DT191GProjektHotell.Models
+@using DT191GProjektHotell.ViewModels
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Bokningar - Dalsjöns Gårdshotell</PageTitle>
+
+<div class="container my-5">
+    <h1 class="text-center h3">Bokningar</h1>
+
+    <div class="mb-3 row g-2 justify-content-center">
+    <div class="col-md-6">
+        <label for="bookingSearch" class="visually-hidden">Sök bokningar</label>
+        <input id="bookingSearch" class="form-control" placeholder="Sök kund, rum eller status..." @bind="BookingSearch" />
+    </div>
+</div>
+
+@foreach (var group in FilteredBookingsGrouped)
+{
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <strong>@group.Key.ToString("yyyy-MM-dd")</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Boknings-ID</th>
+                        <th>Kund</th>
+                        <th>Rum</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Status</th>
+                        <th>Åtgärder</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in group)
+                    {
+                        <tr class="align-middle @(booking.Status == "Incheckad" ? "table-success" : booking.Status == "Avbokad" ? "table-danger" : "")">
+                            <td>@booking.BookingId</td>
+                            <td>@booking.Customer?.FirstName @booking.Customer?.LastName</td>
+                            <td>@booking.Room?.RoomType</td>
+                            <td>@booking.CheckInDate.ToShortDateString()</td>
+                            <td>@booking.CheckOutDate.ToShortDateString()</td>
+                            <td>
+                                @if (booking.Status == "Bekräftad")
+                                {
+                                    <span class="badge bg-warning text-dark">Ej incheckad</span>
+                                }
+                                else if (booking.Status == "Incheckad")
+                                {
+                                    <span class="badge bg-success">Incheckad</span>
+                                }
+                                else if (booking.Status == "Avbokad")
+                                {
+                                    <span class="badge bg-danger">Avbokad</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@booking.Status</span>
+                                }
+                            </td>
+                            <td>
+                                @if (booking.Status == "Bekräftad" && DateTime.Today >= booking.CheckInDate.Date)
+                                {
+                                    <button class="btn btn-sm btn-success me-1" @onclick="() => CheckInBooking(booking.BookingId)">
+                                        <i class="bi bi-box-arrow-in-right"></i> Checka in
+                                    </button>
+                                }
+                                <button class="btn btn-sm btn-primary me-1" @onclick="() => OpenEditBookingDialog(booking)">
+                                    <i class="bi bi-pencil"></i> Redigera
+                                </button>
+                                <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDeleteBooking(booking.BookingId)">
+                                    <i class="bi bi-trash"></i> Ta bort
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(BookingDialogError))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @BookingDialogError
+        <button type="button" class="btn-close" @onclick="() => BookingDialogError = string.Empty" aria-label="Stäng"></button>
+    </div>
+}
+
+   <hr class="my-5" />
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-secondary text-white">
+        <strong>Sök historiska bokningar</strong>
+    </div>
+    <div class="card-body">
+        <div class="row g-2 align-items-end mb-3">
+            <div class="col-auto">
+                <label for="historicalDate" class="form-label">Välj datum</label>
+                <InputDate id="historicalDate" @bind-Value="HistoricalSearchDate" class="form-control" />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" @onclick="SearchHistoricalBookings">
+                    <i class="bi bi-search"></i> Sök
+                </button>
+            </div>
+        </div>
+        @if (HistoricalSearchResults.Any())
+        {
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Boknings-ID</th>
+                        <th>Kund</th>
+                        <th>Rum</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Vuxna</th>
+                        <th>Barn</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in HistoricalSearchResults)
+                    {
+                        <tr>
+                            <td>@booking.BookingId</td>
+                            <td>@booking.Customer?.FirstName @booking.Customer?.LastName</td>
+                            <td>@booking.Room?.RoomType</td>
+                            <td>@booking.CheckInDate.ToShortDateString()</td>
+                            <td>@booking.CheckOutDate.ToShortDateString()</td>
+                            <td>@booking.Adults</td>
+                            <td>@booking.Children</td>
+                            <td>
+                                @if (booking.Status == "Bekräftad")
+                                {
+                                    <span class="badge bg-warning text-dark">Ej incheckad</span>
+                                }
+                                else if (booking.Status == "Incheckad")
+                                {
+                                    <span class="badge bg-success">Incheckad</span>
+                                }
+                                else if (booking.Status == "Avbokad")
+                                {
+                                    <span class="badge bg-danger">Avbokad</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@booking.Status</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else if (HistoricalSearchDate != null)
+        {
+            <div class="text-muted mt-2">Inga bokningar hittades för valt datum.</div>
+        }
+    </div>
+</div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-custom" @onclick="GoBack">
+            <i class="fa-solid fa-arrow-left"></i> Tillbaka
+        </button>
+    </div>
+</div>
+
+@* Dialoger för bokning och borttagning, oförändrade *@
+@if (ShowBookingDialog)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((EditBookingId == 0) ? "Lägg till bokning" : "Redigera bokning")</h5>
+                    <button type="button" class="btn-close" @onclick="CloseBookingDialog"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="BookingVM" OnValidSubmit="SaveBooking">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="mb-2">
+                            <label for="roomType" class="form-label">Rumstyp</label>
+                            <InputSelect id="roomType" @bind-Value="BookingVM.RoomType" class="form-select">
+                                <option value="">-- Välj rumstyp --</option>
+                                @foreach (var possibleRoomType in Rooms.Select(r => r.RoomType).Distinct())
+                                {
+                                    <option value="@possibleRoomType">@possibleRoomType</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="mb-2">
+                            <label for="checkIn" class="form-label">Check In</label>
+                            <InputDate id="checkIn" @bind-Value="BookingVM.CheckInDate" class="form-control" />
+                        </div>
+                        <div class="mb-2">
+                            <label for="checkOut" class="form-label">Check Out</label>
+                            <InputDate id="checkOut" @bind-Value="BookingVM.CheckOutDate" class="form-control" />
+                        </div>
+                        <div class="mb-2">
+                            <label for="adults" class="form-label">Antal vuxna</label>
+                            <InputNumber id="adults" class="form-control" @bind-Value="BookingVM.Adults" min="1" max="10" />
+                        </div>
+                        <div class="mb-2">
+                            <label for="children" class="form-label">Antal barn</label>
+                            <InputNumber id="children" class="form-control" @bind-Value="BookingVM.Children" min="0" max="10" />
+                        </div>
+                        <div class="mb-2">
+                            <label for="email" class="form-label">Kundens e-post</label>
+                            <InputText id="email" @bind-Value="BookingVM.Email" class="form-control" />
+                        </div>
+                        <button type="submit" class="btn btn-success">Spara</button>
+                        <button type="button" class="btn btn-secondary ms-2" @onclick="CloseBookingDialog">Avbryt</button>
+                    </EditForm>
+                    @if (!string.IsNullOrEmpty(BookingDialogError))
+                    {
+                        <div class="alert alert-danger mt-2">@BookingDialogError</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (ShowDeleteBookingDialog)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bekräfta borttagning</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Vill du verkligen ta bort bokningen?</p>
+                    <button class="btn btn-danger" @onclick="DeleteBookingConfirmed">Ja, ta bort</button>
+                    <button class="btn btn-secondary ms-2" @onclick="() => ShowDeleteBookingDialog = false">Avbryt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private List<BookingModel> Bookings = new();
+    private List<CustomerModel> Customers = new();
+    private List<RoomModel> Rooms = new();
+
+    private string BookingSearch = "";
+    private bool ShowBookingDialog = false;
+    private int EditBookingId = 0;
+    private BookingViewModel BookingVM = new();
+    private string BookingDialogError = "";
+    private bool ShowDeleteBookingDialog = false;
+    private int DeleteBookingId;
+
+    // Historik-sökning
+    private DateTime? HistoricalSearchDate;
+    private List<BookingModel> HistoricalSearchResults = new();
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+
+    private async Task LoadData()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Bookings = await context.Bookings.Include(b => b.Customer).Include(b => b.Room).ToListAsync();
+        Customers = await context.Customers.ToListAsync();
+        Rooms = await context.Rooms.ToListAsync();
+    }
+
+    // Grupp för framtida och pågående bokningar, grupperat per incheckningsdatum
+    private IEnumerable<IGrouping<DateTime, BookingModel>> FilteredBookingsGrouped =>
+        Bookings
+            .Where(b =>
+                (string.IsNullOrWhiteSpace(BookingSearch) ||
+                 (b.Customer?.FirstName + " " + b.Customer?.LastName + " " + b.Room?.RoomType + " " + b.Status)
+                    .ToLower().Contains(BookingSearch.ToLower()))
+                && b.CheckInDate >= DateTime.Today)
+            .OrderBy(b => b.CheckInDate)
+            .GroupBy(b => b.CheckInDate.Date);
+
+    private void OpenAddBookingDialog()
+    {
+        EditBookingId = 0;
+        BookingVM = new BookingViewModel
+            {
+                CheckInDate = DateTime.Today,
+                CheckOutDate = DateTime.Today.AddDays(1)
+            };
+        BookingDialogError = "";
+        ShowBookingDialog = true;
+    }
+
+    private void OpenEditBookingDialog(BookingModel booking)
+    {
+        EditBookingId = booking.BookingId;
+        BookingVM = new BookingViewModel
+            {
+                RoomType = booking.Room?.RoomType ?? "",
+                CheckInDate = booking.CheckInDate,
+                CheckOutDate = booking.CheckOutDate,
+                Email = booking.Customer?.Email ?? ""
+            };
+        BookingDialogError = "";
+        ShowBookingDialog = true;
+    }
+
+    private void CloseBookingDialog()
+    {
+        ShowBookingDialog = false;
+        BookingDialogError = "";
+    }
+
+    private async Task SaveBooking()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        var customer = await context.Customers.FirstOrDefaultAsync(c => c.Email == BookingVM.Email);
+        if (customer == null)
+        {
+            BookingDialogError = "Kunden finns inte. Lägg till kunden först.";
+            return;
+        }
+
+        var room = await context.Rooms.FirstOrDefaultAsync(r => r.RoomType == BookingVM.RoomType);
+        if (room == null)
+        {
+            BookingDialogError = "Rumstypen finns inte.";
+            return;
+        }
+
+        var overlap = await context.Bookings.AnyAsync(b =>
+            b.RoomId == room.RoomId &&
+            b.BookingId != EditBookingId &&
+            b.CheckOutDate > BookingVM.CheckInDate!.Value &&
+            b.CheckInDate < BookingVM.CheckOutDate!.Value);
+
+        if (overlap)
+        {
+            BookingDialogError = "Rummet är redan bokat för vald period.";
+            return;
+        }
+
+        if (EditBookingId == 0)
+        {
+            var booking = new BookingModel
+                {
+                    RoomId = room.RoomId,
+                    CustomerId = customer.CustomerId,
+                    CheckInDate = BookingVM.CheckInDate!.Value,
+                    CheckOutDate = BookingVM.CheckOutDate!.Value,
+                    Adults = BookingVM.Adults,
+                    Children = BookingVM.Children,
+                    Status = "Bekräftad"
+                };
+            context.Bookings.Add(booking);
+        }
+        else
+        {
+            var booking = await context.Bookings.FindAsync(EditBookingId);
+            if (booking == null)
+            {
+                BookingDialogError = "Bokningen kunde inte hittas.";
+                return;
+            }
+            booking.RoomId = room.RoomId;
+            booking.CustomerId = customer.CustomerId;
+            booking.CheckInDate = BookingVM.CheckInDate!.Value;
+            booking.CheckOutDate = BookingVM.CheckOutDate!.Value;
+            booking.Adults = BookingVM.Adults;
+            booking.Children = BookingVM.Children;
+        }
+
+        await context.SaveChangesAsync();
+        ShowBookingDialog = false;
+        await LoadData();
+    }
+
+    private void ConfirmDeleteBooking(int bookingId)
+    {
+        DeleteBookingId = bookingId;
+        ShowDeleteBookingDialog = true;
+    }
+
+    private async Task DeleteBookingConfirmed()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var booking = await context.Bookings.FindAsync(DeleteBookingId);
+        if (booking != null)
+        {
+            context.Bookings.Remove(booking);
+            await context.SaveChangesAsync();
+        }
+        ShowDeleteBookingDialog = false;
+        await LoadData();
+    }
+
+    // Checka in-funktion med datumkontroll
+    private async Task CheckInBooking(int bookingId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var booking = await context.Bookings.FindAsync(bookingId);
+        
+        if (booking != null && booking.Status == "Bekräftad")
+        {
+            // Kontrollera att dagens datum inte är före bokningens check-in datum
+            if (DateTime.Today < booking.CheckInDate.Date)
+            {
+                // Visa felmeddelande - du kan lägga till en error-variabel för detta
+                BookingDialogError = $"Incheckning kan inte göras före bokningens startdatum ({booking.CheckInDate.ToShortDateString()}).";
+                return;
+            }
+            
+            booking.Status = "Incheckad";
+            await context.SaveChangesAsync();
+            await LoadData();
+        }
+    }
+
+    // Sök historiska bokningar på valt datum
+    private void SearchHistoricalBookings()
+    {
+        if (HistoricalSearchDate != null)
+        {
+            HistoricalSearchResults = Bookings
+                .Where(b => b.CheckInDate.Date <= HistoricalSearchDate.Value.Date && b.CheckOutDate.Date >= HistoricalSearchDate.Value.Date)
+                .OrderBy(b => b.CheckInDate)
+                .ToList();
+        }
+        else
+        {
+            HistoricalSearchResults = new();
+        }
+    }
+
+    [Inject] private NavigationManager NavManager { get; set; } = default!;
+
+    private void GoBack()
+    {
+        NavManager.NavigateTo("/admin/main");
+    }
+}

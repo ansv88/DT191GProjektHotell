@@ -1,0 +1,147 @@
+﻿@page "/admin/rooms"
+@attribute [Authorize(Roles = "Admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using DT191GProjektHotell.Data
+@using DT191GProjektHotell.Models
+
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Rumshantering - Dalsjöns Gårdshotell</PageTitle>
+
+<div class="container my-5">
+    <h1 class="text-center h3">Rumshantering</h1>
+    <div class="row mb-3">
+        <div class="col-md-3 mb-2">
+            <label for="checkInDate" class="form-label">Ankomstdatum</label>
+            <input id="checkInDate" type="date" class="form-control" @bind="_checkIn" />
+        </div>
+        <div class="col-md-3 mb-2">
+            <label for="checkOutDate" class="form-label">Avresedatum</label>
+            <input id="checkOutDate" type="date" class="form-control" @bind="_checkOut" min="@_checkIn.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-6 mb-2">
+            <label for="roomSearch" class="form-label">Sök rumstyp</label>
+            <input id="roomSearch" type="text" class="form-control" placeholder="Sök rumstyp..." @bind="_search" />
+        </div>
+    </div>
+
+    <!-- Snabb överblick: antal lediga rum per typ -->
+    <div class="row mb-4 justify-content-center">
+        @foreach (var group in _availableRooms.GroupBy(r => r.RoomType))
+        {
+            <div class="col-md-3 col-sm-6 mb-2">
+                <div class="card text-center">
+                    <div class="card-body p-2">
+                        <h6 class="card-title mb-1">@group.Key</h6>
+                        <span class="badge bg-success">Lediga: @group.Count()</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Lista lediga rum -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Rum</th>
+                    <th>Typ</th>
+                    <th>Kapacitet</th>
+                    <th>Pris</th>
+                    <th>Boka</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var room in _filteredAvailableRooms)
+                {
+                    <tr>
+                        <td>@room.RoomNumber</td>
+                        <td>@room.RoomType</td>
+                        <td>@room.Capacity</td>
+                        <td>@room.Price.ToString("C")</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" @onclick="() => OpenBookingDialog(room)">Boka</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-custom" @onclick="GoBack">
+            <i class="fa-solid fa-arrow-left"></i> Tillbaka
+        </button>
+    </div>
+</div>
+
+<!-- BookingDialog Modal -->
+<BookingDialog Show="@showBookingDialog"
+               ShowChanged="@(v => showBookingDialog = v)"
+               Room="@selectedRoom"
+               CheckIn="@selectedCheckIn"
+               CheckOut="@selectedCheckOut"
+               OnBookingSaved="OnBookingSaved" />
+
+@code {
+    private DateTime _checkIn = DateTime.Today;
+    private DateTime _checkOut = DateTime.Today.AddDays(1);
+    private string _search = string.Empty;
+
+    private List<RoomModel> _rooms = new();
+    private List<BookingModel> _bookings = new();
+
+    // Modal state
+    private bool showBookingDialog = false;
+    private RoomModel? selectedRoom;
+    private DateTime selectedCheckIn;
+    private DateTime selectedCheckOut;
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        using var ctx = DbFactory.CreateDbContext();
+        _rooms = await ctx.Rooms.ToListAsync();
+        _bookings = await ctx.Bookings.ToListAsync();
+    }
+
+    private IEnumerable<RoomModel> _availableRooms =>
+        _rooms.Where(room => IsAvailable(room, _checkIn, _checkOut));
+
+    private IEnumerable<RoomModel> _filteredAvailableRooms =>
+        _availableRooms.Where(r => string.IsNullOrWhiteSpace(_search) ||
+                                   r.RoomType.Contains(_search, StringComparison.CurrentCultureIgnoreCase));
+
+    private bool IsAvailable(RoomModel room, DateTime checkIn, DateTime checkOut)
+    {
+        return !_bookings.Any(b =>
+            b.RoomId == room.RoomId &&
+            b.CheckInDate < checkOut &&
+            b.CheckOutDate > checkIn);
+    }
+
+    private void OpenBookingDialog(RoomModel room)
+    {
+        selectedRoom = room;
+        selectedCheckIn = _checkIn;
+        selectedCheckOut = _checkOut;
+        showBookingDialog = true;
+    }
+
+    private async Task OnBookingSaved()
+    {
+        await LoadDataAsync();
+        StateHasChanged();
+    }
+
+    [Inject] private NavigationManager NavManager { get; set; } = default!;
+
+    private void GoBack()
+    {
+        NavManager.NavigateTo("/admin/main");
+    }
+}

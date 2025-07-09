@@ -1,0 +1,127 @@
+﻿@page "/paketerbjudanden"
+@using DT191GProjektHotell.Models
+
+<PageTitle>Paketerbjudanden - Dalsjöns Gårdshotell</PageTitle>
+
+<HeadContent>
+    <!-- Preload första bilden för snabbare LCP -->
+    <link rel="preload" as="image" href="/images/food-2603601_1280.jpg" />
+</HeadContent>
+
+<section class="container my-5" aria-labelledby="packages-heading">
+    <h1 id="packages-heading" class="h2 text-center main-title-color">Aktuella paket & erbjudanden</h1>
+    <p class="lead text-center">
+        Här hittar du våra populära paket där logi, mat och aktiviteter kombineras för en extra minnesvärd vistelse.
+        Passa på att boka ett färdigt paket – smidigt, prisvärt och alltid med det lilla extra!
+    </p>
+
+    <div class="row g-4 mt-4" role="list" aria-label="Tillgängliga paket">
+        <!-- Logi & middagspaket -->
+        <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch" role="listitem">
+            <article class="card shadow-sm w-100 package-card" aria-labelledby="dinner-package-title">
+                <div class="package-image-container">
+                    <img src="/images/food-2603601_1280.jpg"
+                         class="package-image"
+                         alt="Elegant middagsservering med trerättersmeny på restaurang"
+                         loading="eager"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h2 id="dinner-package-title" class="card-title h5">Logi & 3-rätters middag</h2>
+                    <p class="card-text flex-grow-1">
+                        Njut av en övernattning i dubbelrum och en trerätters middag i vår restaurang. Frukostbuffé ingår.
+                    </p>
+                    <ul class="list-unstyled mb-3" role="list" aria-label="Inkluderat i paketet">
+                        <li><i class="fa-solid fa-bed me-2" aria-hidden="true"></i>Dubbelrum för 2 personer</li>
+                        <li><i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>3-rätters middag</li>
+                        <li><i class="fa-solid fa-mug-saucer me-2" aria-hidden="true"></i>Frukostbuffé</li>
+                    </ul>
+                    <div class="mb-3">
+                        <span class="fw-bold h5 packages-price" aria-label="Pris från 1495 kronor per person">Från 1 495 kr/person</span>
+                    </div>
+                    <a href="/bokning?RoomType=Deluxe&paket=LogiMiddag"
+                       class="btn btn-custom w-100"
+                       aria-label="Boka Logi och 3-rätters middagspaket, går till bokningssidan">
+                        Boka paket
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <!-- Familjepaket -->
+        <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch" role="listitem">
+            <article class="card shadow-sm w-100 package-card" aria-labelledby="family-package-title">
+                <div class="package-image-container">
+                    <img src="/images/pillow-2426875_1280.jpg"
+                         class="package-image"
+                         alt="Mysigt familjerum med bekväma sängar och inbjudande atmosfär"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h2 id="family-package-title" class="card-title h5">Familjepaket – bo, ät & upptäck</h2>
+                    <p class="card-text flex-grow-1">
+                        Gör familjevistelsen extra minnesvärd! Bo bekvämt i familjerum, njut av middag och frukost, och få en liten överraskning till barnen. Ange barnens ålder vid bokning för åldersanpassade välkomstpresenter.
+                    </p>
+                    <ul class="list-unstyled mb-3" role="list" aria-label="Inkluderat i paketet">
+                        <li><i class="fa-solid fa-people-roof me-2" aria-hidden="true"></i>Familjerum (upp till 4 personer)</li>
+                        <li><i class="fa-solid fa-gift me-2" aria-hidden="true"></i>Välkomstpresent till barnen</li>
+                        <li><i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>Middag för hela familjen</li>
+                        <li><i class="fa-solid fa-mug-saucer me-2" aria-hidden="true"></i>Frukostbuffé</li>
+                        <li><i class="fa-solid fa-clock me-2" aria-hidden="true"></i>Sen utcheckning</li>
+                    </ul>
+                    <div class="mb-3">
+                        <span class="fw-bold h5 packages-price" aria-label="Pris från 2495 kronor per familj">Från 2 495 kr/familj</span>
+                    </div>
+                    <a href="/bokning?RoomType=Familj&paket=Familjepaket"
+                       class="btn btn-custom w-100"
+                       aria-label="Boka Familjepaket bo ät och upptäck, går till bokningssidan">
+                        Boka paket
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <!-- Aktivitetspaket -->
+        <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch" role="listitem">
+            <article class="card shadow-sm w-100 package-card" aria-labelledby="activity-package-title">
+                <div class="package-image-container">
+                    <img src="/images/canoe-3621377_1280.jpg"
+                         class="package-image"
+                         alt="Kanot på lugnt vatten omgiven av vacker natur för aktivitetspaket"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h2 id="activity-package-title" class="card-title h5">Aktivitetspaket – bo & upptäck</h2>
+                    <p class="card-text flex-grow-1">
+                        Kombinera boende med en valfri aktivitet, t.ex. vandring, cykling eller kanot. Frukostbuffé och lunchpaket ingår.
+                    </p>
+                    <ul class="list-unstyled mb-3" role="list" aria-label="Inkluderat i paketet">
+                        <li><i class="fa-solid fa-bed me-2" aria-hidden="true"></i>Valfritt rum</li>
+                        <li><i class="fa-solid fa-person-hiking me-2" aria-hidden="true"></i>Aktivitetsval</li>
+                        <li><i class="fa-solid fa-mug-saucer me-2" aria-hidden="true"></i>Frukostbuffé</li>
+                        <li><i class="fa-solid fa-bread-slice me-2" aria-hidden="true"></i>Lunchpaket</li>
+                    </ul>
+                    <div class="mb-3">
+                        <span class="fw-bold h5 packages-price" aria-label="Pris från 1295 kronor per person">Från 1 295 kr/person</span>
+                    </div>
+                    <a href="/bokning?paket=Aktivitetspaket"
+                           class="btn btn-custom w-100"
+                           aria-label="Boka Aktivitetspaket bo och upptäck, går till bokningssidan">
+                        Boka paket
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>

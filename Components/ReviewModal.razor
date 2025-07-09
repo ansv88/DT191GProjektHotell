@@ -1,0 +1,181 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<button class="btn btn-outline-secondary btn-sm mt-5 px-3 rounded-pill"
+        style="font-size: 1rem;"
+        @onclick="OpenReviewModal">
+    <i class="fa-solid fa-pen-to-square me-1"></i> Lämna omdöme
+</button>
+
+@if (ShowReviewModal)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.3)">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <EditForm Model="ReviewVM" OnValidSubmit="SubmitReviewAsync">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Lämna ett omdöme efter din vistelse</h5>
+                        <button type="button" class="btn-close" @onclick="CloseReviewModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small mb-3 text-center">
+                            Fyll i formuläret nedan för att lämna ett omdöme om din vistelse. <br /> <br />
+                            <strong>OBS! Bokningsnummer och e-post används endast för verifiering och visas aldrig publikt.</strong>
+                        </p>
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label">Bokningsnummer <span class="text-danger">*</span></label>
+                            <InputNumber class="form-control" @bind-Value="ReviewVM.BookingId" />
+                            <div class="form-text">Du hittar ditt bokningsnummer i din bokningsbekräftelse.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">E-post <span class="text-danger">*</span></label>
+                            <InputText class="form-control" @bind-Value="ReviewVM.Email" />
+                            <div class="form-text">Använd samma e-post som vid bokningen.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Namn (valfritt)</label>
+                            <InputText class="form-control" @bind-Value="ReviewVM.Name" maxlength="50" />
+                            <div class="form-text">Ditt namn visas tillsammans med omdömet om du fyller i det.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Betyg <span class="text-danger">*</span></label>
+                            <div>
+                                <div class="text-muted small mb-2">Klicka för att välja antal stjärnor (1 = dåligt, 5 = utmärkt)</div>
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    var currentRating = i;
+                                    <span style="cursor:pointer;font-size:1.5rem;"
+                                          @onpointerdown="@(e => SetRating(currentRating))">
+                                        <i class="@(currentRating <= ReviewVM.Rating ? "fa-solid fa-star text-warning" : "fa-regular fa-star text-secondary")"></i>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kommentar (valfritt)</label>
+                            <InputTextArea class="form-control" @bind-Value="ReviewVM.Comment" rows="3" maxlength="500" />
+                            <div class="form-text">Dela gärna med dig av vad du tyckte om din vistelse.</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(ReviewError))
+                        {
+                            <div class="alert alert-danger">@ReviewError</div>
+                        }
+                        @if (ReviewSuccess)
+                        {
+                            <div class="alert alert-success">Tack för din recension!</div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" disabled="@ReviewSuccess">Skicka</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseReviewModal">Stäng</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private bool ShowReviewModal = false;
+    private ReviewViewModel ReviewVM = new ReviewViewModel();
+    private string ReviewError = "";
+    private bool ReviewSuccess = false;
+
+    private async Task SubmitReviewAsync()
+    {
+        ReviewError = "";
+        ReviewSuccess = false;
+        using var context = DbFactory.CreateDbContext();
+        var booking = await context.Bookings
+            .Include(b => b.Customer)
+            .FirstOrDefaultAsync(b => b.BookingId == ReviewVM.BookingId && b.Customer != null && b.Customer.Email == ReviewVM.Email);
+
+        if (booking == null)
+        {
+            ReviewError = "Fel bokningsnummer eller e-post. Kontrollera dina uppgifter.";
+            return;
+        }
+
+        string name = "";
+        if (!string.IsNullOrWhiteSpace(ReviewVM.Name))
+        {
+            name = ReviewVM.Name;
+        }
+        else if (booking.Customer != null)
+        {
+            name = booking.Customer.FirstName + " " + booking.Customer.LastName;
+        }
+
+        // Spara recensionen
+        var review = new ReviewModel
+            {
+                BookingId = ReviewVM.BookingId,
+                Name = name,
+                Email = ReviewVM.Email,
+                Rating = ReviewVM.Rating,
+                Comment = ReviewVM.Comment,
+                Created = DateTime.Now
+            };
+        context.Reviews.Add(review);
+        await context.SaveChangesAsync();
+        ReviewSuccess = true;
+
+        ReviewVM = new ReviewViewModel
+            {
+                BookingId = 0,
+                Email = string.Empty,
+                Name = string.Empty,
+                Rating = 0,
+                Comment = string.Empty
+            };
+    }
+
+    private void OpenReviewModal()
+    {
+        ReviewVM = new ReviewViewModel
+            {
+                BookingId = 0,
+                Email = string.Empty,
+                Name = string.Empty,
+                Rating = 0,
+                Comment = string.Empty
+            };
+        ShowReviewModal = true;
+        ReviewError = "";
+        ReviewSuccess = false;
+        StateHasChanged();
+    }
+
+    private void CloseReviewModal()
+    {
+        ShowReviewModal = false;
+        StateHasChanged();
+
+        // Nollställ objektet
+        ReviewVM = new ReviewViewModel
+            {
+                BookingId = 0,
+                Email = string.Empty,
+                Name = string.Empty,
+                Rating = 0,
+                Comment = string.Empty
+            };
+        ReviewError = "";
+        ReviewSuccess = false;
+    }
+
+    private void SetRating(int rating)
+    {
+        // Togglefunktion - om användaren klickar på samma stjärna igen, ta bort betyget
+        if (ReviewVM.Rating == rating)
+            ReviewVM.Rating = 0;
+        else
+            ReviewVM.Rating = rating;
+
+        StateHasChanged();
+    }
+}

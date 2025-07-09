@@ -1,0 +1,321 @@
+@page "/restaurang"
+@using DT191GProjektHotell.Models
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Restaurang - Dalsjöns Gårdshotell</PageTitle>
+
+<HeadContent>
+    <!-- Preload huvudbild -->
+    <link rel="preload" as="image" href="/images/table-3084384_1280.jpg" />
+</HeadContent>
+
+<!-- Introduktion -->
+<section class="container my-5" aria-labelledby="intro-heading">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 id="intro-heading" class="mb-4 main-title-color h2">Välkommen till vår lantliga restaurang</h1>
+            <p class="intro-text">
+                På Dalsjöns Gårdshotell lagar vi mat på det gammaldags viset - med tid, omsorg och passion för det äkta.
+                I vårt mysiga kök använder vi gärna råvaror från gården och närområdet. Vi serverar en riklig frukostbuffé
+                för våra gäster, medan luncher och middagar anpassas efter säsong och era önskemål. För hotellgäster med
+                förbokade paket ingår naturligtvis de måltider som är inkluderade i er vistelse.
+            </p>
+        </div>
+    </div>
+
+    <!-- Restaurangbild -->
+    <div class="row mt-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="image-container">
+                <img src="/images/table-3084384_1280.jpg"
+                     alt="Elegant restaurangmiljö med vackert dukade bord och varm belysning på Dalsjöns Gårdshotell"
+                     class="optimized-image rounded shadow-sm"
+                     loading="eager"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Öppettider och information -->
+<section class="container my-5" aria-labelledby="hours-info-heading">
+    <h2 id="hours-info-heading" class="visually-hidden">Öppettider och viktig information</h2>
+    <div class="row h-100">
+        <!-- Öppettider -->
+        <div class="col-md-6 mb-4 d-flex">
+            <article class="p-4 rounded-3 w-100 restaurant-info-card" role="region" aria-labelledby="hours-heading">
+                <h3 id="hours-heading" class="mb-4 text-center restaurant-title">
+                    <i class="fa-solid fa-clock me-2" aria-hidden="true"></i>Måltider & tider
+                </h3>
+
+                <div class="mb-3">
+                    <h4 class="d-flex align-items-center mb-2 restaurant-title">
+                        <i class="fa-solid fa-coffee fa-lg me-3" aria-hidden="true"></i>
+                        Frukostbuffé
+                    </h4>
+                    <div class="ms-5">
+                        <p class="mb-1"><strong>Vardagar:</strong> <time>07:00 - 09:30</time></p>
+                        <p class="mb-0"><strong>Helger:</strong> <time>07:30 - 10:00</time></p>
+                        <p class="mb-0 small text-muted">Ingår för våra hotellgäster</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h4 class="d-flex align-items-center mb-2 restaurant-title">
+                        <i class="fa-solid fa-utensils fa-lg me-3" aria-hidden="true"></i>
+                        Lunch
+                    </h4>
+                    <div class="ms-5">
+                        <p class="mb-1"><strong>Efter förbokning</strong></p>
+                        <p class="mb-1 small text-muted">För grupper från 8 personer</p>
+                        <p class="mb-0 small text-muted">Lunchpaket ingår i aktivitetspaketet</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="d-flex align-items-center mb-2 restaurant-title">
+                        <i class="fa-solid fa-wine-glass fa-lg me-3" aria-hidden="true"></i>
+                        Middag
+                    </h4>
+                    <div class="ms-5">
+                        <p class="mb-1"><strong>Endast efter förbokning</strong></p>
+                        <p class="mb-1 small text-muted">Ring för att höra veckans meny</p>
+                        <p class="mb-0 small text-muted">Ingår i middags- och familjepaketet</p>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Bokning och information -->
+        <div class="col-md-6 mb-4 d-flex">
+            <article class="p-4 rounded-3 w-100 restaurant-info-card" role="region" aria-labelledby="info-heading">
+                <h3 id="info-heading" class="mb-4 text-center restaurant-title">
+                    <i class="fa-solid fa-info-circle me-2" aria-hidden="true"></i>Viktigt att veta
+                </h3>
+
+                <div class="mb-3">
+                    <h4 class="d-flex align-items-center mb-2 restaurant-title">
+                        <i class="fa-solid fa-gift fa-lg me-3" aria-hidden="true"></i>
+                        Paketgäster
+                    </h4>
+                    <div class="ms-5">
+                        <p class="mb-2">
+                            Har ni bokat ett paket som inkluderar måltider? Då är ni redan anmälda!
+                            Kontakta oss om ni har speciella önskemål eller allergier.
+                        </p>
+                        <p class="mb-0 small text-muted">Se ert bokningsbekräftelse för vad som ingår</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h4 class="d-flex align-items-center mb-2 restaurant-title">
+                        <i class="fa-solid fa-calendar-check fa-lg me-3" aria-hidden="true"></i>
+                        Förbokning krävs
+                    </h4>
+                    <div class="ms-5">
+                        <p class="mb-2">Alla måltider utom frukost kräver förbokning. Ring oss för att höra vad vi kan erbjuda!</p>
+                        <a href="tel:+46712345678"
+                           class="btn btn-outline-success btn-sm mb-1" style="color: #226f67; transition: all 0.2s ease-in-out;" 
+                           onmouseover="this.style.color='white'" 
+                           onmouseout="this.style.color='#226f67'"
+                           aria-label="Ring telefonnummer 0 7 1 2 3 4 5 6 7 8 för att boka måltider">
+                            <i class="fa-solid fa-phone me-1" aria-hidden="true"></i>
+                            +46 712 345 678
+                        </a>
+                        <p class="mb-0 small text-muted">Boka senast dagen innan</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="d-flex align-items-center mb-2 restaurant-title">
+                        <i class="fa-solid fa-heart fa-lg me-3" aria-hidden="true"></i>
+                        Personliga menyer
+                    </h4>
+                    <div class="ms-5">
+                        <p class="mb-0">
+                            Vi anpassar gärna maten efter era önskemål och allergier.
+                            Berätta vad ni gillar så skapar vi något alldeles speciellt!
+                        </p>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- Våra måltider -->
+<section class="container my-5" aria-labelledby="meals-heading">
+    <h2 id="meals-heading" class="text-center mb-5 restaurant-title">
+        <i class="fa-solid fa-plate-wheat me-2" aria-hidden="true"></i>Mat med gårdens smak
+    </h2>
+
+    <!-- Frukost -->
+    <article class="row mb-5 align-items-center" aria-labelledby="breakfast-heading">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="/images/food-3137152_1280.jpg"
+                     alt="Riklig frukostbuffé med nybakt bröd, ägg, ostar, marmelad och färsk frukt uppdukat på träbord"
+                     class="optimized-image rounded"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3 id="breakfast-heading" class="restaurant-meal-heading">Riklig frukostbuffé</h3>
+            <p>
+                Starta dagen rätt med vår omtyckta frukostbuffé! Vi dukar upp med det bästa från vårt eget kök och
+                närområdet - nybakat bröd, hemgjord marmelad, ägg från gårdens höns och säsongens frukt.
+                Här finns både kontinentala favoriter och svenska klassiker för en perfekt start på dagen.
+            </p>
+            <ul class="list-unstyled" role="list">
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Nybakt bröd varje morgon</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Ägg från våra egna höns</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Hemgjord sylt och marmelad</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Lokala ostar och charkuterier</li>
+            </ul>
+            <p class="small text-muted">
+                <i class="fa-solid fa-info-circle me-1" aria-hidden="true"></i>
+                Ingår i alla våra paket och för hotellgäster
+            </p>
+        </div>
+    </article>
+
+    <!-- Lunch -->
+    <article class="row mb-5 align-items-center bg-section flex-column-reverse flex-md-row" aria-labelledby="lunch-heading">
+        <div class="col-md-6">
+            <h3 id="lunch-heading" class="restaurant-title">Lunch för grupper</h3>
+            <p>
+                Vi serverar gärna lunch för större sällskap som bokar i förväg. Menyn varierar beroende på
+                säsong och vad vi har tillgång till - kanske en saftig köttgryta med rotfrukter från trädgården,
+                eller färsk fisk från närliggande sjöar. Ring och fråga vad vi kan bjuda på just er dag!
+            </p>
+            <ul class="list-unstyled" role="list">
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Anpassas efter grupp och tillfälle</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Lokala råvaror efter säsong</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Hemlagat bröd och tillbehör</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Vegetariska alternativ</li>
+            </ul>
+            <p class="fw-bold restaurant-price" style="color: #226f67;">Från 159 kr/person (minst 8 personer)</p>
+            <p class="small text-muted">
+                <i class="fa-solid fa-gift me-1" aria-hidden="true"></i>
+                Lunchpaket ingår i vårt aktivitetspaket
+            </p>
+        </div>
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="/images/food-2603601_1280.jpg"
+                     alt="Vällagad grupplunch med lokala råvaror serverat på rustikt träbord"
+                     class="optimized-image rounded"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </article>
+
+    <!-- Middag -->
+    <article class="row mb-5 align-items-center" aria-labelledby="dinner-heading">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="/images/dinner-939434_1280.jpg"
+                     alt="Elegant middagsservering med vilt och fisk från närområdet, vackert presenterat"
+                     class="optimized-image rounded"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3 id="dinner-heading" class="restaurant-meal-heading">Middagar efter förbokning</h3>
+            <p>
+                Våra middagar är något alldeles särskilt - vi lagar endast det vi kan göra riktigt bra och
+                med kärlek. Ring för att höra veckans förslag, kanske älgfilé från lokala jägare,
+                rödbetor från vår egen trädgård eller färsk gös från Dalsjön. Vi anpassar alltid menyn
+                efter era önskemål och antal gäster.
+            </p>
+            <ul class="list-unstyled" role="list">
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Unik meny för varje tillfälle</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Vilt och fisk från närområdet</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Grönsaker från egen trädgård</li>
+                <li><i class="fa-solid fa-check text-success me-2" aria-hidden="true"></i>Husmanskost med modern touch</li>
+            </ul>
+            <p class="fw-bold restaurant-price">Ring för prisförslag och dagens meny</p>
+            <p class="small text-muted">
+                <i class="fa-solid fa-gift me-1" aria-hidden="true"></i>
+                3-rätters middag ingår i vårt middags- och familjepaket
+            </p>
+        </div>
+    </article>
+</section>
+
+<!-- Kontakt och bokning -->
+<section class="container my-5" aria-labelledby="contact-heading">
+    <div class="row">
+        <div class="col-lg-10 mx-auto text-center">
+            <h2 id="contact-heading" class="mb-4 restaurant-title">Hör av er för en pratstund!</h2>
+            <p class="mb-4">
+                Vi älskar att prata mat och planera måltider tillsammans med våra gäster.
+                Ring för att höra veckans meny, diskutera era önskemål eller bara fråga vad vi kan bjuda på.
+                Ingenting är omöjligt när vi får lite tid att förbereda oss!
+            </p>
+
+            <!-- Enkla knappar utan överlappning -->
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-4" role="group" aria-labelledby="contact-buttons">
+                <h3 id="contact-buttons" class="visually-hidden">Kontaktalternativ</h3>
+
+                <button class="btn btn-custom restaurant-contact-btn"
+                        @onclick="ShowPhoneNumber"
+                        aria-describedby="@(showPhoneNumber ? "phone-help" : "")">
+                    <i class="fa-solid fa-phone me-2" aria-hidden="true"></i>
+                    @if (!showPhoneNumber)
+                    {
+                        <span>Ring och prata mat</span>
+                    }
+                    else
+                    {
+                        <span class="restaurant-phone-number" role="textbox" aria-label="Telefonnummer: noll sju ett två tre fyra fem sex sju åtta">+46 712 345 678</span>
+                    }
+                </button>
+
+                <NavLink href="/kontakt"
+                         class="btn btn-outline-primary restaurant-contact-btn d-flex align-items-center justify-content-center"
+                         aria-label="Gå till kontaktsidan för att skicka förfrågan">
+                    <i class="fa-solid fa-envelope me-2" aria-hidden="true"></i>
+                    <span>Skicka förfrågan</span>
+                </NavLink>
+            </div>
+
+            @if (showPhoneNumber)
+            {
+                <p id="phone-help" class="text-muted small mb-3" aria-live="polite">
+                    <i class="fa-solid fa-info-circle me-1" aria-hidden="true"></i>
+                    Telefonnumret kan markeras och kopieras
+                </p>
+            }
+
+            <p class="mt-3 text-muted small">
+                <i class="fa-solid fa-clock me-2" aria-hidden="true"></i>
+                Vi svarar helst på telefon mellan <time>08:00-18:00</time>, men mail fungerar också bra!
+            </p>
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool showPhoneNumber = false;
+
+    private void ShowPhoneNumber()
+    {
+        showPhoneNumber = true;
+    }
+}

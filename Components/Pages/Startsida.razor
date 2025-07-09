@@ -1,0 +1,446 @@
+﻿@page "/"
+@using DT191GProjektHotell.Components.Layout
+@using DT191GProjektHotell.Models
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Hem - Dalsjöns Gårdshotell</PageTitle>
+
+<HeadContent>
+    <!-- Preload hero-bilden för snabbare LCP -->
+    <link rel="preload" as="image" href="/images/hotel-3514641_1920.jpg" />
+</HeadContent>
+
+<!-- Felmeddelande-visning -->
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" aria-live="polite">
+        <i class="fa-solid fa-exclamation-triangle me-2" aria-hidden="true"></i>
+        <span>@errorMessage</span>
+        <button type="button" class="btn-close" @onclick="ClearError" aria-label="Stäng felmeddelande"></button>
+    </div>
+}
+
+<!-- Hero-bild -->
+<section class="hero position-relative" role="banner">
+    <div class="hero-image-container">
+        <img src="images/hotel-3514641_1920.jpg"
+             alt="Dalsjöns Gårdshotell - pittoreskt hotell beläget vid vackra Dalsjön omgivet av natur"
+             class="hero-image"
+             loading="eager"
+             decoding="async"
+             width="1920"
+             height="1080"
+             onload="this.classList.add('loaded')" />
+    </div>
+</section>
+
+<!-- Intro-rubrik och text -->
+<section class="container my-5" aria-labelledby="welcome-heading">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 id="welcome-heading">Välkommen till Dalsjöns gårdshotell!</h1>
+            <p class="intro-text">
+                Ett stenkast från vackra Dalsjön finner ni denna familjevänliga pärla.
+                Oavsett om du reser ensam, med vännen eller hela familjen så finns det något här för alla.
+                Här kan du koppla av och njuta, och om äventyrslusten smyger sig på så finns det många vackra omgivningar att upptäcka och roliga aktiviteter för hela familjen.
+                <br /> <br />
+                Och du, självklart är hela familjen välkommen, inklusive de fyrbenta familjemedlemmarna.
+            </p>
+        </div>
+    </div>
+
+    <!-- Knappar -->
+    <nav class="row text-center mt-4" role="navigation" aria-label="Huvudnavigation">
+        <div class="col-12 col-md-4 mb-3 d-flex justify-content-center">
+            <NavLink class="btn btn-custom d-flex justify-content-between align-items-center home-nav-btn"
+                     href="/bokning"
+                     aria-label="Gå till bokningssidan för att boka boende">
+                <span>Boka boende</span>
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+            </NavLink>
+        </div>
+        <div class="col-12 col-md-4 mb-3 d-flex justify-content-center">
+            <NavLink class="btn btn-custom d-flex justify-content-between align-items-center home-nav-btn"
+                     href="/paketerbjudanden"
+                     aria-label="Gå till paketerbjudanden för aktuella paket och erbjudanden">
+                <span>Aktuella paket & erbjudanden</span>
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+            </NavLink>
+        </div>
+        <div class="col-12 col-md-4 mb-3 d-flex justify-content-center">
+            <NavLink class="btn btn-custom d-flex justify-content-between align-items-center home-nav-btn"
+                     href="/restaurang"
+                     aria-label="Gå till restaurangsidan för information om våra måltider">
+                <span>Restaurang</span>
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+            </NavLink>
+        </div>
+    </nav>
+</section>
+
+<!-- Statiska bilder för desktop -->
+<section class="container d-none d-md-block my-5" aria-labelledby="rooms-gallery-heading">
+    <h2 id="rooms-gallery-heading" class="visually-hidden">Bildgalleri av våra rum</h2>
+    <div class="row" role="img" aria-label="Bildgalleri som visar våra olika rumstyper">
+        <div class="col-md-4">
+            <div class="image-container">
+                <img src="images/bedroom-3475656_1280.jpg"
+                     class="optimized-image"
+                     alt="Elegant standardrum med dubbelsäng och moderna bekvämligheter"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="image-container">
+                <img src="images/bed-4416515_1280.jpg"
+                     class="optimized-image"
+                     alt="Lyxigt deluxerum med rymlig säng och stilfull inredning"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="image-container">
+                <img src="images/sleep-4685544_1280.jpg"
+                     class="optimized-image"
+                     alt="Bekvämt familjerum med plats för hela familjen"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Karusell för mobilläge -->
+<section class="container d-md-none my-5" aria-labelledby="mobile-gallery-heading">
+    <h2 id="mobile-gallery-heading" class="visually-hidden">Bildkarusell av våra rum</h2>
+    <div id="mobileCarousel"
+         class="carousel slide"
+         data-bs-ride="carousel"
+         role="img"
+         aria-label="Bildkarusell som visar våra olika rumstyper">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="image-container">
+                    <img src="images/bedroom-3475656_1280.jpg"
+                         class="optimized-image"
+                         alt="Elegant standardrum med dubbelsäng och moderna bekvämligheter"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="image-container">
+                    <img src="images/bed-4416515_1280.jpg"
+                         class="optimized-image"
+                         alt="Lyxigt deluxerum med rymlig säng och stilfull inredning"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="image-container">
+                    <img src="images/sleep-4685544_1280.jpg"
+                         class="optimized-image"
+                         alt="Bekvämt familjerum med plats för hela familjen"
+                         loading="lazy"
+                         decoding="async"
+                         width="1280"
+                         height="720"
+                         onload="this.classList.add('loaded')" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigationspilar -->
+        <button class="carousel-control-prev"
+                type="button"
+                data-bs-target="#mobileCarousel"
+                data-bs-slide="prev"
+                aria-label="Föregående bild i karusellen">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Föregående</span>
+        </button>
+        <button class="carousel-control-next"
+                type="button"
+                data-bs-target="#mobileCarousel"
+                data-bs-slide="next"
+                aria-label="Nästa bild i karusellen">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Nästa</span>
+        </button>
+    </div>
+</section>
+
+<!-- Logga -->
+<section class="container text-center my-5">
+    <img src="images/dalsjns-grdshotell-high-resolution-logo-transparent.png"
+         alt="Dalsjöns Gårdshotell logotyp"
+         class="img-fluid home-logo"
+         loading="lazy"
+         width="300"
+         height="150" />
+</section>
+
+<!-- Boende-sektion -->
+<section class="container my-5 bg-section" aria-labelledby="accommodation-heading">
+    <div class="row align-items-center flex-column-reverse flex-md-row">
+        <div class="col-12 col-md-6 text-center pb-3">
+            <h2 id="accommodation-heading">Boende</h2>
+            <p>
+                Våra rum är ljusa, moderna och fräscha, utrustade med allt du behöver
+                för en bekväm vistelse. Välj mellan enkelrum, dubbelrum eller rymliga
+                familjerum. Oavsett vilket du väljer kan du se fram emot en god natts
+                sömn och en avkopplande miljö.
+            </p>
+            <NavLink class="btn btn-custom-2 align-items-center"
+                     href="/vararum"
+                     aria-label="Gå till våra rum för mer information om boende">
+                <span>Våra rum</span>
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+            </NavLink>
+        </div>
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="images/upholstery-4809588_1280.jpg"
+                     alt="Modernt och stilfullt hotellrum med bekväma möbler och elegant inredning"
+                     class="optimized-image"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Restaurang-sektion -->
+<section class="container my-5" aria-labelledby="restaurant-heading">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="images/table-3084384_1280.jpg"
+                     alt="Elegant restaurangmiljö med vackert dukade bord och varm atmosfär"
+                     class="optimized-image"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6 text-center pb-3">
+            <h2 id="restaurant-heading">Vår restaurang</h2>
+            <p>
+                Här kan du njuta av vällagade rätter i en trivsam och avslappnad miljö.
+                Vi serverar god mat med noga utvalda råvaror, gärna med lokala inslag.
+                Oavsett om du vill starta dagen med en härlig frukost, ta en fika
+                eller avrunda kvällen med en smakrik middag, är du varmt välkommen
+                till bords.
+            </p>
+            <NavLink class="btn btn-custom-2 align-items-center"
+                     href="/restaurang"
+                     aria-label="Gå till restaurangsidan för mer information om våra måltider">
+                <span>Restaurang</span>
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+            </NavLink>
+        </div>
+    </div>
+</section>
+
+<!-- Aktiviteter-sektion -->
+<section class="container my-5 bg-section" aria-labelledby="activities-heading">
+    <div class="row align-items-center flex-column-reverse flex-md-row">
+        <div class="col-12 col-md-6 text-center pb-3">
+            <h2 id="activities-heading">Upptäck och upplev</h2>
+            <p>
+                Här finns mycket att se och göra för både stora och små! Utforska de
+                vackra omgivningarna, ta del av spännande aktiviteter eller bara njut
+                av lugnet. Missa inte vår senaste familjesatsning – en stor, nybyggd
+                lekplats där barnen kan leka och ha kul medan de vuxna kopplar av.
+            </p>
+            <NavLink class="btn btn-custom-2 align-items-center"
+                     href="/aktiviteter"
+                     aria-label="Gå till aktivitetssidan för information om våra aktiviteter">
+                <span>Aktiviteter</span>
+                <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i>
+            </NavLink>
+        </div>
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <div class="image-container">
+                <img src="images/playground-4178424_1280.jpg"
+                     alt="Stor lekplats med lekutrustning för barn i naturskön miljö"
+                     class="optimized-image"
+                     loading="lazy"
+                     decoding="async"
+                     width="1280"
+                     height="720"
+                     onload="this.classList.add('loaded')" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recensioner-karusell -->
+<section class="container my-5" aria-labelledby="reviews-heading">
+    <h2 id="reviews-heading" class="text-center mb-4">Gästomdömen</h2>
+    @if (isLoadingReviews)
+    {
+        <div class="d-flex justify-content-center" role="status" aria-live="polite">
+            <div class="spinner-border text-primary" role="progressbar" aria-label="Laddar gästomdömen">
+                <span class="visually-hidden">Laddar...</span>
+            </div>
+        </div>
+    }
+    else if (Reviews.Count == 0)
+    {
+        <div class="alert alert-info text-center" role="status">
+            Det finns inga omdömen ännu.
+        </div>
+    }
+    else
+    {
+        <div id="reviewCarousel"
+             class="carousel slide"
+             data-bs-ride="carousel"
+             role="region"
+             aria-label="Karusell med gästomdömen">
+            <div class="carousel-inner">
+                @foreach (var group in Reviews.Chunk(3).Select((chunk, idx) => new { chunk, idx }))
+                {
+                    <div class="carousel-item @(group.idx == 0 ? "active" : "")">
+                        <div class="row justify-content-center">
+                            @foreach (var review in group.chunk)
+                            {
+                                <div class="col-12 col-md-4 mb-3 d-flex align-items-stretch">
+                                    <article class="card mx-auto shadow-sm w-100 home-review-card"
+                                             aria-labelledby="review-@review.ReviewId">
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="mb-2" role="img" aria-label="Betyg: @review.Rating av 5 stjärnor">
+                                                @for (int i = 0; i < review.Rating; i++)
+                                                {
+                                                    <i class="fa-solid fa-star text-warning" aria-hidden="true"></i>
+                                                }
+                                                @for (int i = review.Rating; i < 5; i++)
+                                                {
+                                                    <i class="fa-regular fa-star text-secondary" aria-hidden="true"></i>
+                                                }
+                                            </div>
+                                            <p class="mb-3 flex-grow-1">@review.Comment</p>
+                                            <div class="review-author">
+                                                <div id="review-@review.ReviewId" class="fw-bold">@review.Name</div>
+                                                <div class="text-muted small">
+                                                    <time datetime="@(review.Booking?.CheckOutDate ?? review.Created):yyyy-MM-dd">
+                                                        Övernattade i @FormatVisitDate(review.Booking?.CheckOutDate ?? review.Created)
+                                                    </time>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Reviews.Count > 3)
+            {
+                <button class="carousel-control-prev"
+                        type="button"
+                        data-bs-target="#reviewCarousel"
+                        data-bs-slide="prev"
+                        aria-label="Föregående grupp av omdömen">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Föregående</span>
+                </button>
+                <button class="carousel-control-next"
+                        type="button"
+                        data-bs-target="#reviewCarousel"
+                        data-bs-slide="next"
+                        aria-label="Nästa grupp av omdömen">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Nästa</span>
+                </button>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private List<ReviewModel> Reviews = new();
+    private bool isLoadingReviews = true;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadReviews();
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett fel uppstod när gästomdömena skulle laddas. Försök uppdatera sidan.";
+            isLoadingReviews = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadReviews()
+    {
+        try
+        {
+            using var context = DbFactory.CreateDbContext();
+            Reviews = await context.Reviews
+                .Include(r => r.Booking)
+                .OrderByDescending(r => r.Created)
+                .Take(15) // Visa max 15 senaste recensioner
+                .ToListAsync();
+
+            isLoadingReviews = false;
+        }
+        catch (Exception)
+        {
+            errorMessage = "Kunde inte ladda gästomdömen från databasen.";
+            isLoadingReviews = false;
+            throw;
+        }
+    }
+
+    private string FormatVisitDate(DateTime date)
+    {
+        try
+        {
+            // Formatera datumet till månad och år på svenska
+            string[] months = { "januari", "februari", "mars", "april", "maj", "juni",
+                          "juli", "augusti", "september", "oktober", "november", "december" };
+
+            return $"{months[date.Month - 1]} {date.Year}";
+        }
+        catch (Exception)
+        {
+            return date.ToString("yyyy-MM");
+        }
+    }
+
+    private void ClearError()
+    {
+        errorMessage = string.Empty;
+    }
+}

@@ -1,0 +1,117 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<footer class="py-4">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-12 col-md-4 mb-3  text-center">
+                <h3 class="h5">Hitta hit</h3>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fa-solid fa-location-dot fa-sm"></i>
+                        Adress:
+                    </li>
+                    <li class="mb-2">
+                        Dalsjöns Gårdshotell
+                    </li>
+                    <li class="mb-2">
+                        Dalsjövägen 1 <br /> 516 30 Dalsjöfors
+                    </li>
+                    <li class="mb-2">
+                        <i class="fa-solid fa-phone fa-sm"></i>
+                        Telefon: +46 712 345 678
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-envelope fa-sm"></i>
+                        <a href="mailto:info@dalsjonsgardshotell.se" class=" text-black text-decoration-none">
+                            E-post: info@dalsjonsgard.se
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-12 col-md-4 text-center mb-3">
+                <img src=images/dalsjns-grdshotell-high-resolution-logo-transparent.png alt="Dalsjöns Gårdshotell logga"
+                     style="max-height: 100px;" class="mb-3" />
+                <div>
+                    @if (isAuthenticated)
+                    {
+                        <a href="/Identity/Account/Logout" class="text-black">
+                            <i class="fa-solid fa-unlock fa-xs"></i>
+                            Admin - logga ut
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/Identity/Account/Login?returnUrl=/admin/main" class="text-black">
+                            <i class="fa-solid fa-lock fa-xs"></i>
+                            Admin - logga in
+                        </a>
+                    }
+                </div>
+
+                <ReviewModal />
+
+            </div>
+
+            <div class="col-12 col-md-4 mb-3 text-center">
+                <h3 class="h5">Sitemap</h3>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <a href="/" class="text-black text-decoration-none">
+                            Hem
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/vararum" class="text-black text-decoration-none">
+                            Våra Rum
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/paketerbjudanden" class="text-black text-decoration-none">
+                            Paket & Erbjudanden
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/restaurang" class="text-black text-decoration-none">
+                            Restaurang
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/aktiviteter" class="text-black text-decoration-none">
+                            Aktiviteter
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/omoss" class="text-black text-decoration-none">
+                            Om oss
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kontakt" class="text-black text-decoration-none">
+                            Kontakt
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+  </footer>
+
+@code {
+    private bool isAuthenticated;
+   
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+    }
+
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/Identity/Account/Logout", forceLoad: true);
+    }
+ }

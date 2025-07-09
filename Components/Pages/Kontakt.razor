@@ -1,0 +1,531 @@
+@page "/kontakt"
+@using DT191GProjektHotell.Models
+@using DT191GProjektHotell.ViewModels
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Kontakt - Dalsjöns Gårdshotell</PageTitle>
+
+<h1 class="text-center mt-4 h2">Kontakt</h1>
+
+<div class="container my-5">
+    <!-- FAQ-sektion -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <h2 class="text-center mb-4 h3" style="color: #28837A;">
+                <i class="fa-solid fa-question-circle me-2"></i>Vanliga frågor
+            </h2>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="p-3 bg-light rounded border-start border-3" style="border-color: #28837A !important;">
+                        <h6 class="fw-bold">Hur bokar jag ett rum?</h6>
+                        <p class="mb-0 small">Du kan boka direkt via vår <a href="/bokning" style="color: #000000; text-decoration: underline !important; font-weight: 600 !important;">bokningssida</a> eller kontakta oss via formuläret nedan.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="p-3 bg-light rounded border-start border-3" style="border-color: #28837A !important;">
+                        <h6 class="fw-bold">Kan jag avboka min bokning?</h6>
+                        <p class="mb-0 small">Ja, du kan avboka fram till 24 timmar före ankomst utan kostnad.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="p-3 bg-light rounded border-start border-3" style="border-color: #28837A !important;">
+                        <h6 class="fw-bold">Är husdjur välkomna?</h6>
+                        <p class="mb-0 small">Ja, husdjur är välkomna mot en mindre avgift. Kontakta oss för mer information.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="p-3 bg-light rounded border-start border-3" style="border-color: #28837A !important;">
+                        <h6 class="fw-bold">Har ni wifi?</h6>
+                        <p class="mb-0 small">Ja, gratis wifi finns tillgängligt i hela hotellet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kontaktuppgifter-->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <h2 class="text-center mb-4 h3" style="color: #28837A;">
+                <i class="fa-solid fa-address-book me-2"></i>Hitta och kontakta oss
+            </h2>
+
+            <div class="row">
+                <!-- Vänster kolumn - Adress och öppettider -->
+                <div class="col-md-6 mb-4">
+                    <div class="p-4 rounded-3" style="background-color: #F2E8CF; border-left: 5px solid #28837A;">
+                        <!-- Adress -->
+                        <div class="mb-4">
+                            <h5 class="d-flex align-items-center mb-3" style="color: #226f67;">
+                                <i class="fa-solid fa-location-dot fa-lg me-3"></i>
+                                Besöksadress
+                            </h5>
+                            <div class="ms-5">
+                                <p class="mb-1"><strong>Dalsjöns Gårdshotell</strong></p>
+                                <p class="mb-1">Dalsjövägen 1</p>
+                                <p class="mb-0">516 30 Dalsjöfors</p>
+                            </div>
+                        </div>
+
+                        <!-- Öppettider -->
+                        <div>
+                            <h5 class="d-flex align-items-center mb-3" style="color: #226f67;">
+                                <i class="fa-solid fa-clock fa-lg me-3"></i>
+                                Bemannad reception
+                            </h5>
+                            <div class="ms-5">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p class="mb-1"><strong>Vardagar:</strong></p>
+                                        <p class="mb-0">07:00 - 21:00</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1"><strong>Helger:</strong></p>
+                                        <p class="mb-0">08:00 - 20:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Höger kolumn - Telefon och e-post -->
+                <div class="col-md-6 mb-4">
+                    <div class="p-4 rounded-3" style="background-color: #F2E8CF; border-left: 5px solid #28837A;">
+                        <!-- Telefon -->
+                        <div class="mb-4">
+                            <h5 class="d-flex align-items-center mb-3" style="color: #226f67;">
+                                <i class="fa-solid fa-phone fa-lg me-3"></i>
+                                Telefon
+                            </h5>
+                            <div class="ms-5">
+                                <a href="tel:+46712345678" class="btn btn-outline-success mb-2" style="color: #226f67; transition: all 0.2s ease-in-out;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#226f67'">
+                                    <i class="fa-solid fa-phone me-1"></i>
+                                    +46 712 345 678
+                                </a>
+                                <p class="mb-0 small text-muted">Tryck för att ringa direkt</p>
+                            </div>
+                        </div>
+
+                        <!-- E-post -->
+                        <div>
+                            <h5 class="d-flex align-items-center mb-3" style="color: #226f67">
+                                <i class="fa-solid fa-envelope fa-lg me-3"></i>
+                                E-post
+                            </h5>
+                            <div class="ms-5">
+                                <a href="mailto:info@dalsjonsgard.se" class="btn btn-outline-primary mb-2">
+                                    <i class="fa-solid fa-envelope me-1"></i>
+                                    info@dalsjonsgard.se
+                                </a>
+                                <p class="mb-0 small text-muted">Tryck för att skicka e-post direkt</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extra information -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="text-center p-3 rounded-3" style="background-color: rgba(40, 131, 122, 0.1); border: 2px solid #28837A;">
+                        <h6 class="mb-3" style="color: #24756d;">
+                            <i class="fa-solid fa-info-circle me-2"></i>Bra att veta
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <i class="fa-solid fa-car me-2" style="color: #28837A;"></i>
+                                <span>Gratis parkering för hotellets gäster</span>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <i class="fa-solid fa-paw me-2" style="color: #28837A;"></i>
+                                <span>Husdjur välkomna (tillägg kan tillkomma)</span>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <i class="fa-solid fa-wifi me-2" style="color: #28837A;"></i>
+                                <span>Wifi finns i hela hotellet</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kontaktformulär -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-2 shadow-sm" style="border-color: #28837A;">
+                <div class="card-header text-center py-3" style="background-color: #F2E8CF; border-bottom: 2px solid #28837A;">
+                    <h3 class="mb-0" style="color: #226f67;">
+                        <i class="fa-solid fa-paper-plane me-2" aria-hidden="true"></i>Skicka meddelande
+                    </h3>
+                    <p class="mb-0 mt-2 text-muted">Har du frågor eller vill boka? Skriv till oss så återkommer vi snart!</p>
+                </div>
+                <div class="card-body p-4" style="background-color: #F2E8CF;">
+
+                    <!-- Svarstidsinformation -->
+                    <div class="alert alert-info mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <i class="fa-solid fa-clock fa-lg" aria-hidden="true"></i>
+                            </div>
+                            <div class="col">
+                                <strong>Svarstid:</strong> Vi svarar normalt inom 2-4 timmar under kontorstid,
+                                och inom 24 timmar på helger.
+                            </div>
+                        </div>
+                    </div>
+
+                    <EditForm Model="ContactVM" OnValidSubmit="@SendMessage" OnInvalidSubmit="@HandleInvalidSubmit" FormName="ContactForm">
+                        <DataAnnotationsValidator />
+
+                        @if (hasValidationErrors)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                                    Kontrollera följande fält:
+                                </h6>
+                                <ValidationSummary />
+                            </div>
+                        }
+
+                        <fieldset class="border-0" disabled="@(isSubmitting || messageSent)">
+                            <legend class="visually-hidden">Kontaktformulär för att skicka meddelande</legend>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">
+                                        Förnamn <span class="text-danger">*</span>
+                                    </label>
+                                    <InputText id="firstName"
+                                               @bind-Value="ContactVM.FirstName"
+                                               class="form-control bg-white border-2"
+                                               placeholder="Ange ditt förnamn"
+                                               aria-required="true" />
+                                    <ValidationMessage For="@(() => ContactVM.FirstName)" class="text-danger small d-block mt-1" />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">
+                                        Efternamn <span class="text-danger">*</span>
+                                    </label>
+                                    <InputText id="lastName"
+                                               @bind-Value="ContactVM.LastName"
+                                               class="form-control bg-white border-2"
+                                               placeholder="Ange ditt efternamn"
+                                               aria-required="true" />
+                                    <ValidationMessage For="@(() => ContactVM.LastName)" class="text-danger small d-block mt-1" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">
+                                        E-post <span class="text-danger">*</span>
+                                    </label>
+                                    <InputText id="email"
+                                               @bind-Value="ContactVM.Email"
+                                               class="form-control bg-white border-2"
+                                               type="email"
+                                               placeholder="din@epost.se"
+                                               aria-required="true" />
+                                    <ValidationMessage For="@(() => ContactVM.Email)" class="text-danger small d-block mt-1" />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="phoneNumber" class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">
+                                        Telefon (valfritt)
+                                    </label>
+                                    <InputText id="phoneNumber"
+                                               @bind-Value="ContactVM.PhoneNumber"
+                                               class="form-control bg-white border-2"
+                                               type="tel"
+                                               placeholder="0712345678" />
+                                    <ValidationMessage For="@(() => ContactVM.PhoneNumber)" class="text-danger small d-block mt-1" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="subject" class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">
+                                    Ämne <span class="text-danger">*</span>
+                                </label>
+                                <InputSelect id="subject" @bind-Value="ContactVM.Subject" class="form-select bg-white border-2"
+                                             aria-required="true" @onchange="OnSubjectChanged">
+                                    <option value="">-- Välj ämne --</option>
+                                    <option value="Bokning">Bokning</option>
+                                    <option value="Frågor om rummen">Frågor om rummen</option>
+                                    <option value="Restaurang">Restaurang</option>
+                                    <option value="Aktiviteter">Aktiviteter</option>
+                                    <option value="Paketerbjudanden">Paketerbjudanden</option>
+                                    <option value="Faktura">Faktura</option>
+                                    <option value="Klagomål">Klagomål</option>
+                                    <option value="Övrigt">Övrigt</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => ContactVM.Subject)" class="text-danger small d-block mt-1" />
+                            </div>
+
+                            @* Dynamiska fält baserat på ämne *@
+                            @if (ContactVM.Subject == "Bokning")
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">Önskad period (valfritt)</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <InputDate class="form-control bg-white border-2" @bind-Value="PreferredCheckIn" />
+                                            <div class="form-text" style="color: #000000 !important; font-weight: 500 !important;">Check-in</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <InputDate class="form-control bg-white border-2" @bind-Value="PreferredCheckOut" />
+                                            <div class="form-text" style="color: #000000 !important; font-weight: 500 !important;">Check-out</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">Antal gäster (valfritt)</label>
+                                    <InputNumber class="form-control bg-white border-2" @bind-Value="GuestCount" min="1" max="6" />
+                                </div>
+                            }
+
+                            <div class="mb-4">
+                                <label for="message" class="form-label fw-semibold" style="color: #000000 !important; font-weight: 700 !important;">
+                                    Meddelande <span class="text-danger">*</span>
+                                </label>
+                                <InputTextArea id="message"
+                                               @bind-Value="ContactVM.Message"
+                                               @oninput="OnMessageInput"
+                                               class="form-control bg-white border-2"
+                                               rows="6"
+                                               placeholder="Berätta gärna mer om ditt ärende..."
+                                               aria-required="true"
+                                               style="resize: vertical;"
+                                               maxlength="1000" />
+                                <div class="form-text d-flex justify-content-between">
+                                    <span style="color: #000000 !important; font-weight: 500 !important;">Beskriv gärna detaljerat vad du behöver hjälp med</span>
+                                    <span class="@(messageLength > 900 ? "text-warning" : "")" style="color: #000000 !important; font-weight: 500 !important;">
+                                        @messageLength/1000 tecken
+                                    </span>
+                                </div>
+                                <ValidationMessage For="@(() => ContactVM.Message)" class="text-danger small d-block mt-1" />
+                            </div>
+                        </fieldset>
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                                <div>
+                                    <strong>Fel:</strong> @errorMessage
+                                    <button type="button" class="btn-close ms-auto" @onclick="ClearError" aria-label="Stäng felmeddelande"></button>
+                                </div>
+                            </div>
+                        }
+
+                        @if (messageSent)
+                        {
+                            <div class="alert alert-success d-flex align-items-center animate__animated animate__fadeIn" role="alert">
+                                <div class="text-center w-100">
+                                    <i class="fa-solid fa-check-circle fa-2x text-success mb-2"></i>
+                                    <h5>Meddelande skickat!</h5>
+                                    <p class="mb-3">Tack för ditt meddelande! Vi återkommer inom 24 timmar till <strong>@lastSubmittedEmail</strong></p>
+                                    <button class="btn btn-success btn-sm" @onclick="SendNewMessage" type="button">
+                                        <i class="fa-solid fa-plus me-1"></i>
+                                        Skicka nytt meddelande
+                                    </button>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="text-center">
+                            <button type="submit"
+                                    class="btn btn-custom px-5 py-3"
+                                    disabled="@(messageSent || isSubmitting)">
+                                @if (isSubmitting)
+                                {
+                                    <span>
+                                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                        Skickar meddelande...
+                                    </span>
+                                }
+                                else if (messageSent)
+                                {
+                                    <span><i class="fa-solid fa-check me-2"></i>Meddelande skickat</span>
+                                }
+                                else
+                                {
+                                    <span><i class="fa-solid fa-paper-plane me-2"></i>Skicka meddelande</span>
+                                }
+                            </button>
+                        </div>
+                        <div class="form-text mt-3 text-center" style="color: #000000 !important; font-weight: 500 !important;">
+                            Genom att skicka meddelandet godkänner du att vi kontaktar dig
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ContactViewModel ContactVM = new ContactViewModel();
+    private string errorMessage = string.Empty;
+    private bool messageSent = false;
+    private bool isSubmitting = false;
+    private bool hasValidationErrors = false;
+    private string lastSubmittedEmail = string.Empty;
+
+    // Dynamiska fält
+    private DateTime? PreferredCheckIn;
+    private DateTime? PreferredCheckOut;
+    private int GuestCount = 2;
+
+    // Teckenräknare
+    private int messageLength = 0;
+
+    private void HandleInvalidSubmit()
+    {
+        hasValidationErrors = true;
+        StateHasChanged();
+    }
+
+    private void OnSubjectChanged(ChangeEventArgs e)
+    {
+        ContactVM.Subject = e.Value?.ToString() ?? string.Empty;
+        hasValidationErrors = false;
+
+        // Förifyll meddelande baserat på ämne
+        switch (ContactVM.Subject)
+        {
+            case "Bokning":
+                ContactVM.Message = "Hej! Jag är intresserad av att boka rum. ";
+                break;
+            case "Restaurang":
+                ContactVM.Message = "Hej! Jag har frågor om er restaurang. ";
+                break;
+            case "Aktiviteter":
+                ContactVM.Message = "Hej! Jag vill veta mer om aktiviteter på hotellet. ";
+                break;
+            case "Paketerbjudanden":
+                ContactVM.Message = "Hej! Jag är intresserad av era paketerbjudanden. ";
+                break;
+            case "Frågor om rummen":
+                ContactVM.Message = "Hej! Jag har frågor om era rum. ";
+                break;
+            case "Faktura":
+                ContactVM.Message = "Hej! Jag har frågor om min faktura. ";
+                break;
+            case "Klagomål":
+                ContactVM.Message = "Hej! Jag vill framföra ett klagomål. ";
+                break;
+            default:
+                ContactVM.Message = "Hej! ";
+                break;
+        }
+
+        messageLength = ContactVM.Message.Length;
+        StateHasChanged();
+    }
+
+    private void OnMessageInput(ChangeEventArgs e)
+    {
+        ContactVM.Message = e.Value?.ToString() ?? string.Empty;
+        messageLength = ContactVM.Message.Length;
+        StateHasChanged();
+    }
+
+    private void ClearError()
+    {
+        errorMessage = string.Empty;
+        hasValidationErrors = false;
+        StateHasChanged();
+    }
+
+    private void SendNewMessage()
+    {
+        messageSent = false;
+        hasValidationErrors = false;
+        ContactVM = new ContactViewModel();
+        PreferredCheckIn = null;
+        PreferredCheckOut = null;
+        GuestCount = 2;
+        messageLength = 0;
+        StateHasChanged();
+    }
+
+    private async Task SendMessage()
+    {
+        isSubmitting = true;
+        hasValidationErrors = false;
+        StateHasChanged();
+
+        try
+        {
+            // Validera datum om det är en bokning
+            if (ContactVM.Subject == "Bokning" && PreferredCheckIn.HasValue && PreferredCheckOut.HasValue)
+            {
+                if (PreferredCheckIn.Value < DateTime.Today)
+                {
+                    errorMessage = "Check-in datum kan inte vara tidigare än idag.";
+                    return;
+                }
+
+                if (PreferredCheckOut.Value <= PreferredCheckIn.Value)
+                {
+                    errorMessage = "Check-out datum måste vara efter check-in datum.";
+                    return;
+                }
+            }
+
+            using var context = DbFactory.CreateDbContext();
+
+            // Utökat meddelande med dynamiska fält
+            var enhancedMessage = ContactVM.Message;
+            if (ContactVM.Subject == "Bokning" && PreferredCheckIn.HasValue && PreferredCheckOut.HasValue)
+            {
+                enhancedMessage += $"\n\nÖnskad period: {PreferredCheckIn:yyyy-MM-dd} till {PreferredCheckOut:yyyy-MM-dd}";
+                enhancedMessage += $"\nAntal gäster: {GuestCount}";
+            }
+
+            var contact = new ContactModel
+            {
+                FirstName = ContactVM.FirstName,
+                LastName = ContactVM.LastName,
+                Email = ContactVM.Email,
+                PhoneNumber = ContactVM.PhoneNumber ?? string.Empty,
+                Subject = ContactVM.Subject,
+                Message = enhancedMessage,
+                Created = DateTime.Now,
+                IsRead = false
+            };
+
+            context.ContactMessages.Add(contact);
+            await context.SaveChangesAsync();
+
+            lastSubmittedEmail = ContactVM.Email;
+            messageSent = true;
+            ContactVM = new ContactViewModel();
+            PreferredCheckIn = null;
+            PreferredCheckOut = null;
+            GuestCount = 2;
+            messageLength = 0;
+            errorMessage = string.Empty;
+        }
+        catch (DbUpdateException)
+        {
+            errorMessage = "Ett databasfel uppstod. Kontrollera dina uppgifter och försök igen.";
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett tekniskt fel uppstod. Försök igen om en stund eller kontakta oss via telefon.";
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+}

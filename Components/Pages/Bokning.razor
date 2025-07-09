@@ -1,0 +1,472 @@
+﻿@page "/bokning/{RoomType?}"
+@using DT191GProjektHotell.Components.Layout
+@using DT191GProjektHotell.Data
+@using DT191GProjektHotell.Models
+@using DT191GProjektHotell.ViewModels
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Boka rum - Dalsjöns Gårdshotell</PageTitle>
+
+<section class="container my-5" aria-labelledby="booking-heading">
+    <h1 id="booking-heading" class="h2 text-center main-title-color">Boka rum</h1>
+    <p class="text-center lead mb-4">Fyll i formuläret nedan för att boka ditt rum på Dalsjöns Gårdshotell</p>
+
+    <div class="booking-form-container mx-auto">
+        <EditForm Model="BookingVM" OnValidSubmit="@BookRoom" FormName="BookingForm" novalidate>
+            <DataAnnotationsValidator />
+
+            @if (!string.IsNullOrEmpty(paket))
+            {
+                <div class="alert alert-info mb-4" role="status" aria-labelledby="paketinformation">
+                    <i class="fa-solid fa-info-circle me-2" aria-hidden="true"></i>
+                    <span id="package-info">
+                        Du har valt ett paketerbjudande. Skriv "<strong>@paket</strong>" i kommentarsfältet så att vi kan ge dig rätt paketpris och innehåll.
+                    </span>
+                </div>
+            }
+
+            <!-- Felmeddelande -->
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mb-4" role="alert" aria-live="assertive" aria-atomic="true">
+                    <h4 class="alert-heading">
+                        <i class="fa-solid fa-exclamation-triangle me-2" aria-hidden="true"></i>
+                        Ett fel uppstod
+                    </h4>
+                    <p class="mb-3">@errorMessage</p>
+                    <hr>
+                    <div class="mb-0">
+                        <button class="btn btn-outline-danger btn-sm me-2" @onclick="ClearError" type="button">
+                            <i class="fa-solid fa-times me-1" aria-hidden="true"></i>
+                            Stäng
+                        </button>
+                        <button class="btn btn-danger btn-sm" @onclick="RetryBooking" type="button">
+                            <i class="fa-solid fa-redo me-1" aria-hidden="true"></i>
+                            Försök igen
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <!-- Valideringssammanfattning -->
+            <ValidationSummary class="alert alert-danger" role="alert" aria-labelledby="valideringsfel" />
+
+            <!-- Loading state -->
+            @if (isSubmitting)
+            {
+                <div class="text-center my-4" role="status" aria-live="polite">
+                    <div class="loading-spinner" aria-label="Bearbetar bokning"></div>
+                    <p class="mt-2">Bearbetar din bokning...</p>
+                </div>
+            }
+
+            <!-- Bokningsdetaljer-kort -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">
+                        <i class="fa-solid fa-calendar-check me-2" aria-hidden="true"></i>
+                        Bokningsdetaljer
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <!-- Rumstyp -->
+                        <div class="col-lg-6">
+                            <label for="roomType" class="form-label">
+                                <i class="fa-solid fa-bed me-1" aria-hidden="true"></i>
+                                Rumstyp <span class="text-danger">*</span>
+                            </label>
+                            <InputSelect @bind-Value="BookingVM.RoomType" class="form-select" id="roomType" aria-describedby="roomType-help">
+                                <option value="">-- Välj rumstyp --</option>
+                                @foreach (var possibleRoomType in PossibleRoomTypes)
+                                {
+                                    <option value="@possibleRoomType">@possibleRoomType</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => BookingVM.RoomType)" class="text-danger small" />
+                        </div>
+
+                        <!-- Information om antal gäster -->
+                        <div class="col-lg-6">
+                            @if (!string.IsNullOrEmpty(BookingVM.RoomType))
+                            {
+                                <div class="mt-4 pt-2">
+                                    <div class="alert alert-info py-3 mb-0">
+                                        <i class="fa-solid fa-info-circle me-2" aria-hidden="true"></i>
+                                        <strong>Max @GetRoomCapacity() personer för @BookingVM.RoomType</strong>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mt-4 pt-2">
+                                    <div class="alert alert-light py-3 mb-0 text-muted">
+                                        <i class="fa-solid fa-info-circle me-2" aria-hidden="true"></i>
+                                        Välj rumstyp för att se kapacitet
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Ankomstdatum -->
+                        <div class="col-lg-6">
+                            <label for="checkIn" class="form-label">
+                                <i class="fa-solid fa-calendar-plus me-1" aria-hidden="true"></i>
+                                Ankomstdatum <span class="text-danger">*</span>
+                            </label>
+                            <InputDate id="checkIn" @bind-Value="BookingVM.CheckInDate" class="form-control" />
+                            <ValidationMessage For="@(() => BookingVM.CheckInDate)" class="text-danger small" />
+                        </div>
+
+                        <!-- Avresedatum -->
+                        <div class="col-lg-6">
+                            <label for="checkOut" class="form-label">
+                                <i class="fa-solid fa-calendar-minus me-1" aria-hidden="true"></i>
+                                Avresedatum <span class="text-danger">*</span>
+                            </label>
+                            <InputDate id="checkOut" @bind-Value="BookingVM.CheckOutDate" class="form-control" />
+                            <ValidationMessage For="@(() => BookingVM.CheckOutDate)" class="text-danger small" />
+                        </div>
+
+                        <!-- Antal vuxna -->
+                        <div class="col-lg-6">
+                            <label for="adults" class="form-label">
+                                <i class="fa-solid fa-user me-1" aria-hidden="true"></i>
+                                Antal vuxna <span class="text-danger">*</span>
+                            </label>
+                            <InputNumber id="adults" class="form-control" @bind-Value="BookingVM.Adults" min="1" max="@GetMaxAdults()" />
+                            <ValidationMessage For="@(() => BookingVM.Adults)" class="text-danger small" />
+                        </div>
+
+                        <!-- Antal barn -->
+                        <div class="col-lg-6">
+                            <label for="children" class="form-label">
+                                <i class="fa-solid fa-child me-1" aria-hidden="true"></i>
+                                Antal barn
+                            </label>
+                            <InputNumber id="children" class="form-control" @bind-Value="BookingVM.Children" min="0" max="@GetMaxChildren()" />
+                            <div class="form-text">Barn under 12 år</div>
+                            <ValidationMessage For="@(() => BookingVM.Children)" class="text-danger small" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontaktinformation-kort -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">
+                        <i class="fa-solid fa-user me-2" aria-hidden="true"></i>
+                        Kontaktinformation
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <!-- Förnamn -->
+                        <div class="col-lg-6">
+                            <label for="firstName" class="form-label">
+                                Förnamn <span class="text-danger">*</span>
+                            </label>
+                            <InputText id="firstName" @bind-Value="BookingVM.FirstName" class="form-control" autocomplete="given-name" />
+                            <ValidationMessage For="@(() => BookingVM.FirstName)" class="text-danger small" />
+                        </div>
+
+                        <!-- Efternamn -->
+                        <div class="col-lg-6">
+                            <label for="lastName" class="form-label">
+                                Efternamn <span class="text-danger">*</span>
+                            </label>
+                            <InputText id="lastName" @bind-Value="BookingVM.LastName" class="form-control" autocomplete="family-name" />
+                            <ValidationMessage For="@(() => BookingVM.LastName)" class="text-danger small" />
+                        </div>
+
+                        <!-- E-postadress -->
+                        <div class="col-lg-6">
+                            <label for="email" class="form-label">
+                                <i class="fa-solid fa-envelope me-1" aria-hidden="true"></i>
+                                E-postadress <span class="text-danger">*</span>
+                            </label>
+                            <InputText id="email" @bind-Value="BookingVM.Email" class="form-control" type="email" autocomplete="email" />
+                            <div class="form-text">Vi skickar bokningsbekräftelse till denna adress</div>
+                            <ValidationMessage For="@(() => BookingVM.Email)" class="text-danger small" />
+                        </div>
+
+                        <!-- Telefonnummer -->
+                        <div class="col-lg-6">
+                            <label for="phoneNumber" class="form-label">
+                                <i class="fa-solid fa-phone me-1" aria-hidden="true"></i>
+                                Telefonnummer <span class="text-danger">*</span>
+                            </label>
+                            <InputText id="phoneNumber" @bind-Value="BookingVM.PhoneNumber" class="form-control" type="tel" autocomplete="tel" />
+                            <div class="form-text">För kontakt vid behov</div>
+                            <ValidationMessage For="@(() => BookingVM.PhoneNumber)" class="text-danger small" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meddelande-kort (valfritt) -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">
+                        <i class="fa-solid fa-comment me-2" aria-hidden="true"></i>
+                        Meddelande (valfritt)
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <label for="note" class="form-label">Notering till hotellet</label>
+                    <InputTextArea id="note" class="form-control" @bind-Value="BookingVM.Note" rows="4"
+                                   placeholder="T.ex. specialönskemål, allergier eller om du har valt ett paket" />
+                    <div class="form-text">
+                        Berätta gärna om specialönskemål, allergier eller andra önskemål du har för din vistelse.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Felmeddelande -->
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fa-solid fa-exclamation-triangle me-2" aria-hidden="true"></i>
+                    @errorMessage
+                </div>
+            }
+
+            <!-- Skicka-knapp -->
+            <div class="text-center">
+                <button type="submit"
+                        class="btn btn-custom btn-lg px-5 py-3"
+                        disabled="@isSubmitting"
+                        aria-describedby="submit-help">
+                    @if (isSubmitting)
+                    {
+                        <span class="loading-spinner me-2" aria-hidden="true"></span>
+                        <span>Bearbetar...</span>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-check me-2" aria-hidden="true"></i>
+                        <span>Slutför bokning</span>
+                    }
+                </button>
+                <div id="submit-help" class="form-text mt-2">
+                    Genom att slutföra bokningen godkänner du våra <a href="/villkor">villkor</a>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string? RoomType { get; set; }
+
+    private BookingViewModel BookingVM = new BookingViewModel();
+
+    private List<string> PossibleRoomTypes = new();
+
+    private Dictionary<string, int> roomTypeCapacities = new();
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? paket { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        // Hämta alla tillgängliga rumstyper från databasen
+        PossibleRoomTypes = await context.Rooms
+            .Select(r => r.RoomType)
+            .Distinct()
+            .ToListAsync();
+
+        // Hämta kapacitet för varje rumstyp
+        var roomTypes = await context.Rooms
+            .GroupBy(r => r.RoomType)
+            .Select(g => new { RoomType = g.Key, Capacity = g.First().Capacity })
+            .ToListAsync();
+
+        // Skapa ordbok för snabb uppslagning av kapacitet per rumstyp
+        roomTypeCapacities = roomTypes.ToDictionary(
+            rt => rt.RoomType,
+            rt => rt.Capacity
+        );
+
+        // Om en routeparameter skickats med, använd den (endast om BookingVM.RoomType är tom)
+        if (!string.IsNullOrEmpty(RoomType) && string.IsNullOrEmpty(BookingVM.RoomType))
+        {
+            BookingVM.RoomType = RoomType;
+        }
+    }
+
+    private string errorMessage = string.Empty;
+
+    private bool isSubmitting = false;
+
+    private async Task BookRoom()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+        // Skapa/hämta en kund från databasen
+        using var context = DbFactory.CreateDbContext();
+
+        // Kontrollera totalantal personer mot rumstypens kapacitet
+        int totalGuests = BookingVM.Adults + BookingVM.Children;
+
+        // Hämta första rummet av den valda typen för att kontrollera kapaciteten
+        var roomOfSelectedType = await context.Rooms
+            .FirstOrDefaultAsync(r => r.RoomType == BookingVM.RoomType);
+
+        if (roomOfSelectedType == null)
+        {
+            errorMessage = "Den valda rumstypen existerar inte.";
+            return;
+        }
+
+        // Kontrollera om antalet gäster överstiger rumskapaciteten
+        if (totalGuests > roomOfSelectedType.Capacity)
+        {
+            errorMessage = $"Det valda rummet har en kapacitet på max {roomOfSelectedType.Capacity} personer. " +
+                          $"Du har valt totalt {totalGuests} personer (vuxna + barn).";
+            return;
+        }
+
+        // Hämta befintlig kund via e-post, eller skapa ny kund
+        var customer = await context.Customers
+            .FirstOrDefaultAsync(c => c.Email == BookingVM.Email);
+
+        if (customer == null)
+        {
+            // Skapa ny kund om ingen finns
+            customer = new CustomerModel
+            {
+                FirstName = BookingVM.FirstName,
+                LastName = BookingVM.LastName,
+                Email = BookingVM.Email,
+                PhoneNumber = BookingVM.PhoneNumber
+            };
+            context.Customers.Add(customer);
+            await context.SaveChangesAsync(); // Spara för att få CustomerId
+        }
+
+        // Sök efter ett ledigt rum av den begärda typen där det inte finns någon bokning som överlappar den nya bokningen
+        var availableRoom = await context.Rooms
+            .Where(r => r.RoomType == BookingVM.RoomType)
+            .Where(r => !context.Bookings.Any(b =>
+                b.RoomId == r.RoomId &&
+                b.CheckOutDate > BookingVM.CheckInDate! &&  // befintlig bokning slutar efter att den nya bokningen börjar
+                b.CheckInDate < BookingVM.CheckOutDate!))    // befintlig bokning börjar innan den nya bokningen slutar
+            .FirstOrDefaultAsync();
+
+        if (availableRoom == null)
+        {
+            errorMessage = "Tyvärr, inga lediga rum av vald typ finns tillgängliga för den önskade perioden.";
+            return;
+        }
+
+        // Skapa en ny bokning
+        var booking = new BookingModel
+        {
+            RoomId = availableRoom.RoomId,
+            CustomerId = customer.CustomerId,
+            CheckInDate = BookingVM.CheckInDate!.Value,
+            CheckOutDate = BookingVM.CheckOutDate!.Value,
+            Adults = BookingVM.Adults,
+            Children = BookingVM.Children,
+            Status = "Bekräftad"
+        };
+
+        // Spara bokningen i databasen
+        context.Bookings.Add(booking);
+        await context.SaveChangesAsync();
+
+        // Navigera till bekräftelsesidan
+        NavigationManager.NavigateTo($"/bokningsbekraftelse/{booking.BookingId}");
+
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett oväntat fel uppstod när bokningen skulle bearbetas. Kontrollera dina uppgifter och försök igen.";
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearError()
+    {
+        errorMessage = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task RetryBooking()
+    {
+        errorMessage = string.Empty;
+        await BookRoom();
+    }
+
+    // Hämtar rumkapaciteten för den valda rumstypen
+    private int GetRoomCapacity()
+    {
+        if (string.IsNullOrEmpty(BookingVM.RoomType) || !roomTypeCapacities.ContainsKey(BookingVM.RoomType))
+            return 2; // Standardkapacitet
+
+        return roomTypeCapacities[BookingVM.RoomType];
+    }
+
+    // Beräknar maximalt antal vuxna baserat på rumkapacitet och antal barn
+    private int GetMaxAdults()
+    {
+        int capacity = GetRoomCapacity();
+        // Om det finns barn, begränsa max vuxna
+        int maxAdults = capacity - BookingVM.Children;
+        return Math.Max(1, maxAdults); // Minst 1 vuxen krävs alltid
+    }
+
+    // Beräknar maximalt antal barn baserat på rumkapacitet och antal vuxna
+    private int GetMaxChildren()
+    {
+        int capacity = GetRoomCapacity();
+        // Om det finns vuxna, begränsa max barn
+        int maxChildren = capacity - BookingVM.Adults;
+        return Math.Max(0, maxChildren);
+    }
+
+    // Hanterar ändringar i antal vuxna och uppdaterar max antal barn vid behov
+    private void OnAdultsChanged(int value)
+    {
+        BookingVM.Adults = value;
+        // Om totala antalet nu överstiger kapaciteten, minska antal barn
+        int capacity = GetRoomCapacity();
+        if (BookingVM.Adults + BookingVM.Children > capacity)
+        {
+            BookingVM.Children = Math.Max(0, capacity - BookingVM.Adults);
+        }
+    }
+
+    // Hanterar ändringar i antal barn och uppdaterar max antal vuxna vid behov
+    private void OnChildrenChanged(int value)
+    {
+        BookingVM.Children = value;
+        // Om totala antalet nu överstiger kapaciteten, minska antal vuxna
+        int capacity = GetRoomCapacity();
+        if (BookingVM.Adults + BookingVM.Children > capacity)
+        {
+            BookingVM.Adults = Math.Max(1, capacity - BookingVM.Children);
+        }
+    }
+}

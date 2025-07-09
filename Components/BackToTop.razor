@@ -1,0 +1,40 @@
+﻿@inject IJSRuntime JS
+@inject ILogger<BackToTop> Logger
+
+<button id="scrollTopBtn"
+        class="to-top btn rounded-circle shadow position-fixed bottom-0 end-0 m-3 d-none"
+        style="z-index:2000;"
+        @onclick="ScrollToTop"
+        aria-label="Gå tillbaka till toppen av sidan"
+        title="Tillbaka till toppen">
+    <i class="fa-solid fa-angle-up white" aria-hidden="true"></i>
+</button>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("initScrollTopButton");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Fel vid initialisering av BackToTop-komponent");
+            }
+        }
+    }
+
+    private async Task ScrollToTop()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("window.scrollTo", 0, 0);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Fel vid scroll till toppen");
+        }
+    }
+}
