@@ -57,7 +57,7 @@ Administratörer får ett inloggat gränssnitt för att hantera bokningar, rum, gäst
 
 - **Gäster**: Utforska hotellet, boka rum, lämna recension och skicka meddelanden.
 
--**Admin**: Logga in via adminpanelen och hantera bokningar, rum, gäster och kontaktmeddelanden.
+- **Admin**: Logga in via adminpanelen och hantera bokningar, rum, gäster och kontaktmeddelanden.
 
 ## Förslag på vidareutveckling
 
