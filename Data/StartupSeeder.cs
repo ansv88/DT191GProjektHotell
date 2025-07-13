@@ -5,7 +5,6 @@ namespace DT191GProjektHotell.Data;
 
 public static class StartupSeeder
 {
-    // Nu med parametrar för adminEmail och adminPassword
     public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider, string adminEmail, string adminPassword)
     {
         using var scope = serviceProvider.CreateScope();
@@ -20,7 +19,6 @@ public static class StartupSeeder
             await roleManager.CreateAsync(new IdentityRole(adminRoleName));
         }
 
-        // Skapa admin-user om den inte finns
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
@@ -38,7 +36,6 @@ public static class StartupSeeder
             }
         }
 
-        // Se till att användaren har Admin-rollen
         var rolesForUser = await userManager.GetRolesAsync(adminUser);
         if (!rolesForUser.Contains(adminRoleName))
         {

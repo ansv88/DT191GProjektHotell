@@ -178,7 +178,7 @@
     </div>
 </div>
 
-@* Dialoger för bokning och borttagning, oförändrade *@
+@* Dialoger för bokning och borttagning *@
 @if (ShowBookingDialog)
 {
     <div class="modal show d-block" tabindex="-1">
@@ -420,7 +420,7 @@
             // Kontrollera att dagens datum inte är före bokningens check-in datum
             if (DateTime.Today < booking.CheckInDate.Date)
             {
-                // Visa felmeddelande - du kan lägga till en error-variabel för detta
+                // Visa felmeddelande
                 BookingDialogError = $"Incheckning kan inte göras före bokningens startdatum ({booking.CheckInDate.ToShortDateString()}).";
                 return;
             }

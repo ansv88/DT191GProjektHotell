@@ -73,13 +73,13 @@ public class Program
             throw new Exception("Admin-e-post och lösenord måste anges i appsettings.json eller som miljövariabler!");
         }
 
-        // Se till att databasen finns och migrations är körda
+        // Se till att databasen finns och migrationer är körda
         using (var scope = app.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             db.Database.Migrate();
 
-            // Kör runtime-seeding av Admin-användare (med email/lösenord från config)
+            // Kör runtime-seeding av Admin-användare
             await StartupSeeder.SeedAdminUserAsync(app.Services, adminEmail, adminPassword);
         }
 
