@@ -1,6 +1,6 @@
 /* GRUNDLÄGGANDE STILAR OCH GLOBALA INSTÄLLNINGAR */
 
-/* Globala basstillar */
+/* Globala basstilar */
 * {
     font-family: "Anaheim", sans-serif;
     font-size: 18px;
@@ -382,6 +382,19 @@ footer {
     border-top: 1px solid #eee;
 }
 
+/* Karusellpilar för gästomdömen */
+#reviewCarousel .carousel-control-prev,
+#reviewCarousel .carousel-control-next {
+    background-color: #28837A !important;
+}
+
+#reviewCarousel .carousel-control-prev:focus,
+#reviewCarousel .carousel-control-next:focus {
+    outline: 3px solid #005fcc;
+    outline-offset: 2px;
+}
+
+
 /* RESTAURANGSIDA */
 .restaurant-title {
     color: #28837A;
@@ -537,6 +550,12 @@ button[style*="user-select: text"] {
     .about-hero-image-container {
         padding-bottom: 40%;
     }
+
+    #reviewCarousel .carousel-control-prev,
+    #reviewCarousel .carousel-control-next {
+        width: 40px !important;
+        height: 40px !important;
+    }
     
     .restaurant-intro-image {
         max-height: 300px;
@@ -548,9 +567,13 @@ button[style*="user-select: text"] {
     .about-hero-image-container {
         padding-bottom: 35%;
     }
-}
 
-@media (max-width: 575px) {
+    #reviewCarousel .carousel-control-prev,
+    #reviewCarousel .carousel-control-next {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
     .btn-custom {
         min-width: auto !important;
         width: 100%;

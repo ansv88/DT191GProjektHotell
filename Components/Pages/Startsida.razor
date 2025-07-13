@@ -317,68 +317,149 @@
     }
     else
     {
-        <div id="reviewCarousel"
-             class="carousel slide"
-             data-bs-ride="carousel"
-             role="region"
-             aria-label="Karusell med gästomdömen">
-            <div class="carousel-inner">
-                @foreach (var group in Reviews.Chunk(3).Select((chunk, idx) => new { chunk, idx }))
-                {
-                    <div class="carousel-item @(group.idx == 0 ? "active" : "")">
-                        <div class="row justify-content-center">
-                            @foreach (var review in group.chunk)
-                            {
-                                <div class="col-12 col-md-4 mb-3 d-flex align-items-stretch">
-                                    <article class="card mx-auto shadow-sm w-100 home-review-card"
-                                             aria-labelledby="review-@review.ReviewId">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="mb-2" role="img" aria-label="Betyg: @review.Rating av 5 stjärnor">
-                                                @for (int i = 0; i < review.Rating; i++)
-                                                {
-                                                    <i class="fa-solid fa-star text-warning" aria-hidden="true"></i>
-                                                }
-                                                @for (int i = review.Rating; i < 5; i++)
-                                                {
-                                                    <i class="fa-regular fa-star text-secondary" aria-hidden="true"></i>
-                                                }
-                                            </div>
-                                            <p class="mb-3 flex-grow-1">@review.Comment</p>
-                                            <div class="review-author">
-                                                <div id="review-@review.ReviewId" class="fw-bold">@review.Name</div>
-                                                <div class="text-muted small">
-                                                    <time datetime="@(review.Booking?.CheckOutDate ?? review.Created):yyyy-MM-dd">
-                                                        Övernattade i @FormatVisitDate(review.Booking?.CheckOutDate ?? review.Created)
-                                                    </time>
+        <!-- Desktop layout -->
+        <div class="d-none d-md-block">
+            <div class="position-relative mx-5 px-5">
+                <div id="reviewCarouselDesktop"
+                     class="carousel slide"
+                     data-bs-ride="carousel"
+                     role="region"
+                     aria-label="Karusell med gästomdömen">
+                    <div class="carousel-inner">
+                        @{ 
+                            var desktopGroups = Reviews.Chunk(3).Select((chunk, idx) => new { chunk, idx }).ToList(); 
+                        }
+                        
+                        @foreach (var group in desktopGroups)
+                        {
+                            <div class="carousel-item @(group.idx == 0 ? "active" : "")">
+                                <div class="row justify-content-center">
+                                    @foreach (var review in group.chunk)
+                                    {
+                                        <div class="col-md-4 mb-3 d-flex align-items-stretch">
+                                            <article class="card mx-auto shadow-sm w-100 home-review-card"
+                                                     aria-labelledby="review-desktop-@review.ReviewId">
+                                                <div class="card-body d-flex flex-column">
+                                                    <div class="mb-2" role="img" aria-label="Betyg: @review.Rating av 5 stjärnor">
+                                                        @for (int i = 0; i < review.Rating; i++)
+                                                        {
+                                                            <i class="fa-solid fa-star text-warning" aria-hidden="true"></i>
+                                                        }
+                                                        @for (int i = review.Rating; i < 5; i++)
+                                                        {
+                                                            <i class="fa-regular fa-star text-secondary" aria-hidden="true"></i>
+                                                        }
+                                                    </div>
+                                                    <p class="mb-3 flex-grow-1">@review.Comment</p>
+                                                    <div class="review-author">
+                                                        <div id="review-desktop-@review.ReviewId" class="fw-bold">@review.Name</div>
+                                                        <div class="text-muted small">
+                                                            <time datetime="@(review.Booking?.CheckOutDate ?? review.Created):yyyy-MM-dd">
+                                                                Övernattade i @FormatVisitDate(review.Booking?.CheckOutDate ?? review.Created)
+                                                            </time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    @if (desktopGroups.Count > 1)
+                    {
+                        <button class="carousel-control-prev position-absolute top-50 translate-middle-y rounded-circle border-0 opacity-100 d-flex align-items-center justify-content-center carousel-arrow-green"
+                                type="button"
+                                data-bs-target="#reviewCarouselDesktop"
+                                data-bs-slide="prev"
+                                aria-label="Föregående grupp av omdömen"
+                                style="width: 40px; height: 40px; left: -80px; z-index: 10; background-color: #28837A;">
+                            <span class="carousel-control-prev-icon opacity-100" aria-hidden="true" style="width: 18px; height: 18px;"></span>
+                            <span class="visually-hidden">Föregående</span>
+                        </button>
+                        <button class="carousel-control-next position-absolute top-50 translate-middle-y rounded-circle border-0 opacity-100 d-flex align-items-center justify-content-center carousel-arrow-green"
+                                type="button"
+                                data-bs-target="#reviewCarouselDesktop"
+                                data-bs-slide="next"
+                                aria-label="Nästa grupp av omdömen"
+                                style="width: 40px; height: 40px; right: -80px; z-index: 10; background-color: #28837A;">
+                            <span class="carousel-control-next-icon opacity-100" aria-hidden="true" style="width: 18px; height: 18px;"></span>
+                            <span class="visually-hidden">Nästa</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile layout -->
+        <div class="d-md-none">
+            <div class="position-relative mx-4 px-3">
+                <div id="reviewCarouselMobile"
+                     class="carousel slide"
+                     data-bs-ride="carousel"
+                     role="region"
+                     aria-label="Karusell med gästomdömen">
+                    <div class="carousel-inner">
+                        @foreach (var review in Reviews.Select((r, idx) => new { review = r, idx }))
+                        {
+                            <div class="carousel-item @(review.idx == 0 ? "active" : "")">
+                                <div class="row justify-content-center">
+                                    <div class="col-10 d-flex align-items-stretch">
+                                        <article class="card mx-auto shadow-sm w-100 home-review-card"
+                                                 aria-labelledby="review-mobile-@review.review.ReviewId">
+                                            <div class="card-body d-flex flex-column">
+                                                <div class="mb-2" role="img" aria-label="Betyg: @review.review.Rating av 5 stjärnor">
+                                                    @for (int i = 0; i < review.review.Rating; i++)
+                                                    {
+                                                        <i class="fa-solid fa-star text-warning" aria-hidden="true"></i>
+                                                    }
+                                                    @for (int i = review.review.Rating; i < 5; i++)
+                                                    {
+                                                        <i class="fa-regular fa-star text-secondary" aria-hidden="true"></i>
+                                                    }
+                                                </div>
+                                                <p class="mb-3 flex-grow-1">@review.review.Comment</p>
+                                                <div class="review-author">
+                                                    <div id="review-mobile-@review.review.ReviewId" class="fw-bold">@review.review.Name</div>
+                                                    <div class="text-muted small">
+                                                        <time datetime="@(review.review.Booking?.CheckOutDate ?? review.review.Created):yyyy-MM-dd">
+                                                            Övernattade i @FormatVisitDate(review.review.Booking?.CheckOutDate ?? review.review.Created)
+                                                        </time>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </article>
+                                        </article>
+                                    </div>
                                 </div>
-                            }
-                        </div>
+                            </div>
+                        }
                     </div>
-                }
+                    
+                    @if (Reviews.Count > 1)
+                    {
+                        <button class="carousel-control-prev position-absolute top-50 translate-middle-y rounded-circle border-0 opacity-100 d-flex align-items-center justify-content-center carousel-arrow-green"
+                                type="button"
+                                data-bs-target="#reviewCarouselMobile"
+                                data-bs-slide="prev"
+                                aria-label="Föregående omdöme"
+                                style="width: 32px; height: 32px; left: -20px; z-index: 10; background-color: #28837A;">
+                            <span class="carousel-control-prev-icon opacity-100" aria-hidden="true" style="width: 14px; height: 14px;"></span>
+                            <span class="visually-hidden">Föregående</span>
+                        </button>
+                        <button class="carousel-control-next position-absolute top-50 translate-middle-y rounded-circle border-0 opacity-100 d-flex align-items-center justify-content-center carousel-arrow-green"
+                                type="button"
+                                data-bs-target="#reviewCarouselMobile"
+                                data-bs-slide="next"
+                                aria-label="Nästa omdöme"
+                                style="width: 32px; height: 32px; right: -20px; z-index: 10; background-color: #28837A;">
+                            <span class="carousel-control-next-icon opacity-100" aria-hidden="true" style="width: 14px; height: 14px;"></span>
+                            <span class="visually-hidden">Nästa</span>
+                        </button>
+                    }
+                </div>
             </div>
-            @if (Reviews.Count > 3)
-            {
-                <button class="carousel-control-prev"
-                        type="button"
-                        data-bs-target="#reviewCarousel"
-                        data-bs-slide="prev"
-                        aria-label="Föregående grupp av omdömen">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Föregående</span>
-                </button>
-                <button class="carousel-control-next"
-                        type="button"
-                        data-bs-target="#reviewCarousel"
-                        data-bs-slide="next"
-                        aria-label="Nästa grupp av omdömen">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Nästa</span>
-                </button>
-            }
         </div>
     }
 </section>
